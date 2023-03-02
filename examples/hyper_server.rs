@@ -8,8 +8,8 @@ use std::net::SocketAddr;
 
 use futures::Future;
 use hyper::{server::conn::Http, service::service_fn};
-use monoio::net::TcpListener;
-use monoio_compat::TcpStreamCompat;
+use snowfallio::net::TcpListener;
+use snowfallio_compat::TcpStreamCompat;
 
 #[derive(Clone)]
 struct HyperExecutor;
@@ -20,7 +20,7 @@ where
     F::Output: 'static,
 {
     fn execute(&self, fut: F) {
-        monoio::spawn(fut);
+        snowfallio::spawn(fut);
     }
 }
 
@@ -34,7 +34,7 @@ where
     let listener = TcpListener::bind(addr.into())?;
     loop {
         let (stream, _) = listener.accept().await?;
-        monoio::spawn(
+        snowfallio::spawn(
             Http::new()
                 .with_executor(HyperExecutor)
                 .serve_connection(TcpStreamCompat::new(stream), service_fn(service)),
@@ -55,7 +55,7 @@ async fn hyper_handler(req: Request<Body>) -> Result<Response<Body>, std::conver
     }
 }
 
-#[monoio::main(threads = 2)]
+#[snowfallio::main(threads = 2)]
 async fn main() {
     println!("Running http server on 0.0.0.0:23300");
     let _ = serve_http(([0, 0, 0, 0], 23300), hyper_handler).await;

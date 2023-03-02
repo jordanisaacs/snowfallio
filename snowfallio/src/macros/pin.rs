@@ -15,7 +15,7 @@
 ///     // async logic here
 /// }
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
 ///     let mut future = my_async_fn();
 ///     (&mut future).await;
@@ -25,13 +25,13 @@
 /// To make this work requires pinning:
 ///
 /// ```
-/// use monoio::pin;
+/// use snowfallio::pin;
 ///
 /// async fn my_async_fn() {
 ///     // async logic here
 /// }
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
 ///     let future = my_async_fn();
 ///     pin!(future);
@@ -58,7 +58,7 @@
 ///     // async logic here
 /// }
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
 ///     let mut future = pin!(my_async_fn());
 ///     (&mut future).await;
@@ -69,13 +69,13 @@
 /// a variant of the macro that supports doing both in one go.
 ///
 /// ```
-/// use monoio::{pin, select};
+/// use snowfallio::{pin, select};
 ///
 /// async fn my_async_fn() {
 ///     // async logic here
 /// }
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
 ///     pin! {
 ///         let future1 = my_async_fn();

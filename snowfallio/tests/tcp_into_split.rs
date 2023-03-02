@@ -3,13 +3,13 @@ use std::{
     net, thread,
 };
 
-use monoio::{
+use snowfallio::{
     io::{AsyncReadRent, AsyncWriteRentExt, Splitable},
     net::{TcpListener, TcpStream},
     try_join,
 };
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn split() -> Result<()> {
     const MSG: &[u8] = b"split";
 
@@ -50,7 +50,7 @@ async fn split() -> Result<()> {
     Ok(())
 }
 #[cfg(unix)]
-#[monoio::test_all(enable_timer = true)]
+#[snowfallio::test_all(enable_timer = true)]
 async fn reunite() -> Result<()> {
     let listener = net::TcpListener::bind("127.0.0.1:0")?;
     let addr = listener.local_addr()?;
@@ -79,7 +79,7 @@ async fn reunite() -> Result<()> {
 #[cfg(unix)]
 
 /// Test that dropping the write half actually closes the stream.
-#[monoio::test_all(enable_timer = true, entries = 1024)]
+#[snowfallio::test_all(enable_timer = true, entries = 1024)]
 async fn drop_write() -> Result<()> {
     const MSG: &[u8] = b"split";
 
@@ -113,8 +113,8 @@ async fn drop_write() -> Result<()> {
     assert_eq!(read_res.unwrap(), MSG.len());
     assert_eq!(&read_buf[..MSG.len()], MSG);
     // drop it while the read is in progress
-    monoio::spawn(async move {
-        monoio::time::sleep(std::time::Duration::from_millis(10)).await;
+    snowfallio::spawn(async move {
+        snowfallio::time::sleep(std::time::Duration::from_millis(10)).await;
         drop(write_half);
     });
     match read_half.read(read_buf).await.0 {

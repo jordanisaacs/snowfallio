@@ -3,12 +3,12 @@
 //! Run the example and `nc 127.0.0.1 50002` in another shell.
 //! All your input will be echoed out.
 
-use monoio::{
+use snowfallio::{
     io::{AsyncReadRent, AsyncWriteRentExt},
     net::{TcpListener, TcpStream},
 };
 
-#[monoio::main(driver = "fusion")]
+#[snowfallio::main(driver = "fusion")]
 async fn main() {
     // tracing_subscriber::fmt().with_max_level(tracing::Level::TRACE).init();
     let listener = TcpListener::bind("127.0.0.1:50002").unwrap();
@@ -18,7 +18,7 @@ async fn main() {
         match incoming {
             Ok((stream, addr)) => {
                 println!("accepted a connection from {addr}");
-                monoio::spawn(echo(stream));
+                snowfallio::spawn(echo(stream));
             }
             Err(e) => {
                 println!("accepted connection failed: {e}");

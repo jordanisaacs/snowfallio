@@ -23,10 +23,10 @@
 /// able to run **concurrently** but not in **parallel**. This means all
 /// expressions are run on the same thread and if one branch blocks the thread,
 /// all other expressions will be unable to continue. If parallelism is
-/// required, spawn each async expression using [`monoio::spawn`] and pass the
+/// required, spawn each async expression using [`snowfallio::spawn`] and pass the
 /// join handle to `try_join!`.
 ///
-/// [`monoio::spawn`]: crate::spawn
+/// [`snowfallio::spawn`]: crate::spawn
 ///
 /// # Examples
 ///
@@ -43,9 +43,9 @@
 /// # Ok(())
 /// }
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
-///     let res = monoio::try_join!(do_stuff_async(), more_async_work());
+///     let res = snowfallio::try_join!(do_stuff_async(), more_async_work());
 ///
 ///     match res {
 ///         Ok((first, second)) => {

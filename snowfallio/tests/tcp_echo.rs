@@ -1,9 +1,9 @@
-use monoio::{
+use snowfallio::{
     io::{self, AsyncReadRentExt, AsyncWriteRentExt, Splitable},
     net::{TcpListener, TcpStream},
 };
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn echo_server() {
     const ITER: usize = 1024;
 
@@ -14,7 +14,7 @@ async fn echo_server() {
 
     let msg = "foo bar baz";
     let iov_msg = "iovec_is_so_good";
-    monoio::spawn(async move {
+    snowfallio::spawn(async move {
         let mut stream = TcpStream::connect(&addr).await.unwrap();
 
         let mut buf_vec_to_write: Option<Vec<Vec<u8>>> = Some(vec![
@@ -33,7 +33,7 @@ async fn echo_server() {
             assert_eq!(&buf[..], msg.as_bytes());
 
             // writev
-            let buf_vec: monoio::buf::VecBuf = buf_vec_to_write.take().unwrap().into();
+            let buf_vec: snowfallio::buf::VecBuf = buf_vec_to_write.take().unwrap().into();
             let (res, buf_vec) = stream.write_vectored_all(buf_vec).await;
             let raw_vec: Vec<Vec<u8>> = buf_vec.into();
             assert!(res.is_ok());
@@ -41,7 +41,7 @@ async fn echo_server() {
             buf_vec_to_write = Some(raw_vec);
 
             // readv
-            let buf_vec: monoio::buf::VecBuf = vec![vec![0; 3], vec![0; iov_msg.len() - 3]].into();
+            let buf_vec: snowfallio::buf::VecBuf = vec![vec![0; 3], vec![0; iov_msg.len() - 3]].into();
             let (res, buf_vec) = stream.read_vectored_exact(buf_vec).await;
             assert!(res.is_ok());
             assert_eq!(res.unwrap(), iov_msg.len());
@@ -63,13 +63,13 @@ async fn echo_server() {
 }
 
 #[cfg(unix)]
-#[monoio::test_all(timer_enabled = true)]
+#[snowfallio::test_all(timer_enabled = true)]
 async fn rw_able() {
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     let listener_addr = listener.local_addr().unwrap();
 
-    monoio::select! {
-        _ = monoio::time::sleep(std::time::Duration::from_millis(50)) => {},
+    snowfallio::select! {
+        _ = snowfallio::time::sleep(std::time::Duration::from_millis(50)) => {},
         _ = listener.readable(false) => {
             panic!("unexpected readable");
         }
@@ -79,8 +79,8 @@ async fn rw_able() {
     assert!(active.writable(false).await.is_ok());
     assert!(listener.readable(false).await.is_ok());
     let (conn, _) = listener.accept().await.unwrap();
-    monoio::select! {
-        _ = monoio::time::sleep(std::time::Duration::from_millis(50)) => {},
+    snowfallio::select! {
+        _ = snowfallio::time::sleep(std::time::Duration::from_millis(50)) => {},
         _ = conn.readable(false) => {
             panic!("unexpected readable");
         }

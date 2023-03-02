@@ -1,6 +1,6 @@
 use std::{future::Future, io};
 
-use monoio::BufResult;
+use snowfallio::BufResult;
 use reusable_box_future::ReusableLocalBoxFuture;
 
 use crate::buf::{Buf, RawBuf};

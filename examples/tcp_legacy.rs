@@ -1,7 +1,7 @@
 //! An example to show how to use TcpStream.
 
 use futures::channel::oneshot;
-use monoio::{
+use snowfallio::{
     io::{AsyncReadRent, AsyncWriteRentExt},
     net::{TcpListener, TcpStream},
     Buildable, Driver,
@@ -9,7 +9,7 @@ use monoio::{
 
 fn main() {
     println!("Will run with LegacyDriver(you must enable legacy feature)");
-    run::<monoio::LegacyDriver>();
+    run::<snowfallio::LegacyDriver>();
 }
 
 fn run<D>()
@@ -20,7 +20,7 @@ where
 
     let (mut tx, rx) = oneshot::channel::<()>();
     let client_thread = std::thread::spawn(|| {
-        monoio::start::<D, _>(async move {
+        snowfallio::start::<D, _>(async move {
             println!("[Client] Waiting for server ready");
             tx.cancellation().await;
 
@@ -35,7 +35,7 @@ where
     });
 
     let server_thread = std::thread::spawn(|| {
-        monoio::start::<D, _>(async move {
+        snowfallio::start::<D, _>(async move {
             let listener = TcpListener::bind(ADDRESS)
                 .unwrap_or_else(|_| panic!("[Server] Unable to bind to {ADDRESS}"));
             println!("[Server] Bind ready");

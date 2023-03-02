@@ -3,9 +3,9 @@ use libc::getegid;
 #[cfg(unix)]
 use libc::geteuid;
 #[cfg(unix)]
-use monoio::net::UnixStream;
+use snowfallio::net::UnixStream;
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn test_socket_pair() {
     let (a, b) = UnixStream::pair().unwrap();
     let cred_a = a.peer_cred().unwrap();

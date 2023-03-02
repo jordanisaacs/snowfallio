@@ -217,7 +217,7 @@ pub unsafe trait IoBufMut: Unpin + 'static {
     /// # Examples
     ///
     /// ```
-    /// use monoio::buf::{IoBuf, IoBufMut};
+    /// use snowfallio::buf::{IoBuf, IoBufMut};
     ///
     /// let buf = b"hello world".to_vec();
     /// buf.slice(5..10);

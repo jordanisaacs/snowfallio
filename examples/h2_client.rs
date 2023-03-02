@@ -2,10 +2,10 @@
 //! Note: This is only meant for compatible usage.
 //! Example code is modified from https://github.com/hyperium/h2/blob/master/examples/client.rs.
 
-use monoio::net::TcpStream;
-use monoio_compat::StreamWrapper;
+use snowfallio::net::TcpStream;
+use snowfallio_compat::StreamWrapper;
 
-#[monoio::main]
+#[snowfallio::main]
 async fn main() {
     let tcp = TcpStream::connect("127.0.0.1:5928").await.unwrap();
     let tcp_wrapper = StreamWrapper::new(tcp);
@@ -27,7 +27,7 @@ async fn main() {
     stream.send_trailers(trailers).unwrap();
 
     // Spawn a task to run the conn...
-    monoio::spawn(async move {
+    snowfallio::spawn(async move {
         if let Err(e) = h2.await {
             println!("GOT ERR={e:?}");
         }

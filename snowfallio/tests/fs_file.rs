@@ -2,7 +2,7 @@ use std::io::prelude::*;
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, RawFd};
 
-use monoio::fs::File;
+use snowfallio::fs::File;
 use tempfile::NamedTempFile;
 
 const HELLO: &[u8] = b"hello world...";
@@ -17,7 +17,7 @@ async fn read_hello(file: &File) {
 }
 
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn basic_read() {
     let mut tempfile = tempfile();
     tempfile.write_all(HELLO).unwrap();
@@ -26,7 +26,7 @@ async fn basic_read() {
     read_hello(&file).await;
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn basic_read_exact() {
     let mut tempfile = tempfile();
     tempfile.write_all(HELLO).unwrap();
@@ -42,7 +42,7 @@ async fn basic_read_exact() {
     assert_eq!(res.unwrap_err().kind(), std::io::ErrorKind::UnexpectedEof);
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn basic_write() {
     let tempfile = tempfile();
 
@@ -53,7 +53,7 @@ async fn basic_write() {
     assert_eq!(file, HELLO);
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn basic_write_all() {
     let tempfile = tempfile();
 
@@ -64,7 +64,7 @@ async fn basic_write_all() {
     assert_eq!(file, HELLO);
 }
 #[cfg(unix)]
-#[monoio::test(driver = "uring")]
+#[snowfallio::test(driver = "uring")]
 async fn cancel_read() {
     let mut tempfile = tempfile();
     tempfile.write_all(HELLO).unwrap();
@@ -77,7 +77,7 @@ async fn cancel_read() {
     read_hello(&file).await;
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn explicit_close() {
     let mut tempfile = tempfile();
     tempfile.write_all(HELLO).unwrap();
@@ -90,7 +90,7 @@ async fn explicit_close() {
     assert_invalid_fd(fd);
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn drop_open() {
     let tempfile = tempfile();
 
@@ -107,11 +107,11 @@ async fn drop_open() {
 fn drop_off_runtime() {
     let tempfile = tempfile();
     #[cfg(target_os = "linux")]
-    let file = monoio::start::<monoio::IoUringDriver, _>(async {
+    let file = snowfallio::start::<snowfallio::IoUringDriver, _>(async {
         File::open(tempfile.path()).await.unwrap()
     });
     #[cfg(not(target_os = "linux"))]
-    let file = monoio::start::<monoio::LegacyDriver, _>(async {
+    let file = snowfallio::start::<snowfallio::LegacyDriver, _>(async {
         File::open(tempfile.path()).await.unwrap()
     });
 
@@ -121,7 +121,7 @@ fn drop_off_runtime() {
     assert_invalid_fd(fd);
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn sync_doesnt_kill_anything() {
     let tempfile = tempfile();
 
@@ -144,7 +144,7 @@ async fn poll_once(future: impl std::future::Future) {
     use std::task::Poll;
 
     use futures::future::poll_fn;
-    use monoio::pin;
+    use snowfallio::pin;
 
     pin!(future);
 

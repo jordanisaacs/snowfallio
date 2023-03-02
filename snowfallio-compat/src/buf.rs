@@ -1,6 +1,6 @@
 use std::{mem::MaybeUninit, ptr::null};
 
-use monoio::buf::{IoBuf, IoBufMut};
+use snowfallio::buf::{IoBuf, IoBufMut};
 
 /// RawBuf is not a real buf. It only hold the pointer of the buffer.
 /// Users must make sure the buffer behind the pointer is always valid.

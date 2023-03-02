@@ -360,7 +360,7 @@ impl From<Runtime<TimeDriver<IoUringDriver>>> for FusionRuntime<TimeDriver<IoUri
 /// lifecycle of that task.
 ///
 ///
-/// [`JoinHandle`]: monoio::task::JoinHandle
+/// [`JoinHandle`]: snowfallio::task::JoinHandle
 ///
 /// # Examples
 ///
@@ -368,9 +368,9 @@ impl From<Runtime<TimeDriver<IoUringDriver>>> for FusionRuntime<TimeDriver<IoUri
 /// that processes each received connection.
 ///
 /// ```no_run
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
-///     let handle = monoio::spawn(async {
+///     let handle = snowfallio::spawn(async {
 ///         println!("hello from a background task");
 ///     });
 ///

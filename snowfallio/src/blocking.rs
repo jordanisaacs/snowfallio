@@ -119,7 +119,7 @@ where
 }
 
 /// DefaultThreadPool is a simple wrapped `threadpool::ThreadPool` that implememt
-/// `monoio::blocking::ThreadPool`. You may use this implementation, or you can use your own thread
+/// `snowfallio::blocking::ThreadPool`. You may use this implementation, or you can use your own thread
 /// pool implementation.
 pub struct DefaultThreadPool {
     pool: ThreadPoolImpl,

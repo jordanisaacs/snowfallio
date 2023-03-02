@@ -1,12 +1,12 @@
 use std::net::{IpAddr, SocketAddr};
 
-use monoio::net::{TcpListener, TcpStream};
+use snowfallio::net::{TcpListener, TcpStream};
 #[cfg(unix)]
 
 macro_rules! test_connect_ip {
     ($(($ident:ident, $target:expr, $addr_f:path),)*) => {
         $(
-            #[monoio::test_all]
+            #[snowfallio::test_all]
             async fn $ident() {
                 let listener = TcpListener::bind($target).unwrap();
                 let addr = listener.local_addr().unwrap();
@@ -14,7 +14,7 @@ macro_rules! test_connect_ip {
 
                 let (tx, rx) = local_sync::oneshot::channel();
 
-                monoio::spawn(async move {
+                snowfallio::spawn(async move {
                     let (socket, addr) = listener.accept().await.unwrap();
                     assert_eq!(addr, socket.peer_addr().unwrap());
                     assert!(tx.send(socket).is_ok());
@@ -40,7 +40,7 @@ test_connect_ip! {
 macro_rules! test_connect {
     ($(($ident:ident, $mapping:tt),)*) => {
         $(
-            #[monoio::test_all]
+            #[snowfallio::test_all]
             async fn $ident() {
                 let listener = TcpListener::bind("127.0.0.1:0").unwrap();
                 #[allow(clippy::redundant_closure_call)]
@@ -54,7 +54,7 @@ macro_rules! test_connect {
                     assert!(TcpStream::connect(addr).await.is_ok());
                 };
 
-                monoio::join!(server, client);
+                snowfallio::join!(server, client);
             }
         )*
     }
@@ -85,7 +85,7 @@ test_connect! {
     })),
 }
 #[cfg(unix)]
-#[monoio::test_all(timer_enabled = true)]
+#[snowfallio::test_all(timer_enabled = true)]
 async fn connect_timeout_dst() {
     let drop_flag = DropFlag::default();
     let drop_flag_copy = drop_flag.clone();
@@ -95,32 +95,32 @@ async fn connect_timeout_dst() {
             TcpStream::connect("1.1.1.1:1").await
         };
 
-        let res = monoio::select! {
+        let res = snowfallio::select! {
             _ = connect => { false }
-            _ = monoio::time::sleep(std::time::Duration::from_secs(1)) => { true }
+            _ = snowfallio::time::sleep(std::time::Duration::from_secs(1)) => { true }
         };
         assert!(res);
     }
     drop_flag.assert_dropped();
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn connect_invalid_dst() {
     assert!(TcpStream::connect("127.0.0.1:1").await.is_err());
 }
 
 #[cfg(unix)]
-#[monoio::test_all(timer_enabled = true)]
+#[snowfallio::test_all(timer_enabled = true)]
 async fn cancel_read() {
-    use monoio::io::CancelableAsyncReadRent;
+    use snowfallio::io::CancelableAsyncReadRent;
 
     let mut s = TcpStream::connect("rsproxy.cn:80").await.unwrap();
     let buf = vec![0; 20];
 
-    let canceler = monoio::io::Canceller::new();
+    let canceler = snowfallio::io::Canceller::new();
     let handle = canceler.handle();
-    monoio::spawn(async move {
-        monoio::time::sleep(std::time::Duration::from_millis(100)).await;
+    snowfallio::spawn(async move {
+        snowfallio::time::sleep(std::time::Duration::from_millis(100)).await;
         canceler.cancel();
     });
     let (res, _) = s.cancelable_read(buf, handle).await;
@@ -128,22 +128,22 @@ async fn cancel_read() {
 }
 
 #[cfg(unix)]
-#[monoio::test_all(timer_enabled = true)]
+#[snowfallio::test_all(timer_enabled = true)]
 async fn cancel_select() {
-    use monoio::io::CancelableAsyncReadRent;
+    use snowfallio::io::CancelableAsyncReadRent;
 
     let mut s = TcpStream::connect("rsproxy.cn:80").await.unwrap();
     let buf = vec![0; 20];
 
-    let canceler = monoio::io::Canceller::new();
+    let canceler = snowfallio::io::Canceller::new();
     let handle = canceler.handle();
 
-    let timer = monoio::time::sleep(std::time::Duration::from_millis(100));
-    monoio::pin!(timer);
+    let timer = snowfallio::time::sleep(std::time::Duration::from_millis(100));
+    snowfallio::pin!(timer);
     let recv = s.cancelable_read(buf, handle);
-    monoio::pin!(recv);
+    snowfallio::pin!(recv);
 
-    monoio::select! {
+    snowfallio::select! {
         _ = &mut timer => {
             canceler.cancel();
             let (res, _buf) = recv.await;

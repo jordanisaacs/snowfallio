@@ -31,9 +31,9 @@ use crate::{
 /// Creates a new file and write data to it:
 ///
 /// ```no_run
-/// use monoio::fs::File;
+/// use snowfallio::fs::File;
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ///     // Open a file
 ///     let file = File::create("hello.txt").await?;
@@ -72,9 +72,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let f = File::open("foo.txt").await?;
     ///
@@ -98,9 +98,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let f = File::create("foo.txt").await?;
     ///
@@ -148,9 +148,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let f = File::open("foo.txt").await?;
     ///     let buffer = vec![0; 10];
@@ -201,9 +201,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let f = File::open("foo.txt").await?;
     ///     let buffer = vec![0; 10];
@@ -280,9 +280,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = File::create("foo.txt").await?;
     ///
@@ -327,9 +327,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = File::create("foo.txt").await?;
     ///
@@ -385,9 +385,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let f = File::create("foo.txt").await?;
     ///     let (res, buf) = f.write_at(&b"Hello, world!"[..], 0).await;
@@ -425,9 +425,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let f = File::create("foo.txt").await?;
     ///     let (res, buf) = f.write_at(&b"Hello, world!"[..], 0).await;
@@ -460,9 +460,9 @@ impl File {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::File;
+    /// use snowfallio::fs::File;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     // Open the file
     ///     let f = File::open("foo.txt").await?;

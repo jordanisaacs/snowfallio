@@ -28,9 +28,9 @@ use crate::{
 /// # Examples
 ///
 /// ```
-/// use monoio::time::{self, Duration};
+/// use snowfallio::time::{self, Duration};
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     let mut interval = time::interval(Duration::from_millis(10));
 ///
@@ -54,14 +54,14 @@ use crate::{
 /// seconds.
 ///
 /// ```
-/// use monoio::time;
+/// use snowfallio::time;
 ///
 /// async fn task_that_takes_a_second() {
 ///     println!("hello");
 ///     time::sleep(time::Duration::from_secs(1)).await
 /// }
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     let mut interval = time::interval(time::Duration::from_secs(2));
 ///     for _i in 0..5 {
@@ -94,9 +94,9 @@ pub fn interval(period: Duration) -> Interval {
 /// # Examples
 ///
 /// ```
-/// use monoio::time::{interval_at, Duration, Instant};
+/// use snowfallio::time::{interval_at, Duration, Instant};
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     let start = Instant::now() + Duration::from_millis(50);
 ///     let mut interval = interval_at(start, Duration::from_millis(10));
@@ -124,10 +124,10 @@ pub fn interval_at(start: Instant, period: Duration) -> Interval {
 /// following:
 ///
 /// ```
-/// use monoio::time::{self, Duration};
+/// use snowfallio::time::{self, Duration};
 /// # async fn task_that_takes_one_to_three_millis() {}
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     // ticks every 2 milliseconds
 ///     let mut interval = time::interval(Duration::from_millis(2));
@@ -172,10 +172,10 @@ pub enum MissedTickBehavior {
     /// In code:
     ///
     /// ```
-    /// use monoio::time::{interval, Duration};
+    /// use snowfallio::time::{interval, Duration};
     /// # async fn task_that_takes_200_millis() {}
     ///
-    /// # #[monoio::main(timer_enabled = true)]
+    /// # #[snowfallio::main(timer_enabled = true)]
     /// # async fn main() {
     /// let mut interval = interval(Duration::from_millis(50));
     ///
@@ -228,10 +228,10 @@ pub enum MissedTickBehavior {
     /// In code:
     ///
     /// ```
-    /// use monoio::time::{interval, Duration, MissedTickBehavior};
+    /// use snowfallio::time::{interval, Duration, MissedTickBehavior};
     /// # async fn task_that_takes_more_than_50_millis() {}
     ///
-    /// # #[monoio::main(timer_enabled = true)]
+    /// # #[snowfallio::main(timer_enabled = true)]
     /// # async fn main() {
     /// let mut interval = interval(Duration::from_millis(50));
     /// interval.set_missed_tick_behavior(MissedTickBehavior::Delay);
@@ -279,10 +279,10 @@ pub enum MissedTickBehavior {
     /// In code:
     ///
     /// ```
-    /// use monoio::time::{interval, Duration, MissedTickBehavior};
+    /// use snowfallio::time::{interval, Duration, MissedTickBehavior};
     /// # async fn task_that_takes_75_millis() {}
     ///
-    /// # #[monoio::main(timer_enabled = true)]
+    /// # #[snowfallio::main(timer_enabled = true)]
     /// # async fn main() {
     /// let mut interval = interval(Duration::from_millis(50));
     /// interval.set_missed_tick_behavior(MissedTickBehavior::Skip);
@@ -373,9 +373,9 @@ impl Interval {
     /// ```
     /// use std::time::Duration;
     ///
-    /// use monoio::time;
+    /// use snowfallio::time;
     ///
-    /// #[monoio::main(timer_enabled = true)]
+    /// #[snowfallio::main(timer_enabled = true)]
     /// async fn main() {
     ///     let mut interval = time::interval(Duration::from_millis(10));
     ///

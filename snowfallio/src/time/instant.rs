@@ -39,7 +39,7 @@ impl Instant {
     /// # Examples
     ///
     /// ```
-    /// use monoio::time::Instant;
+    /// use snowfallio::time::Instant;
     ///
     /// let now = Instant::now();
     /// ```
@@ -47,7 +47,7 @@ impl Instant {
         variant::now()
     }
 
-    /// Create a `monoio::time::Instant` from a `std::time::Instant`.
+    /// Create a `snowfallio::time::Instant` from a `std::time::Instant`.
     pub fn from_std(std: std::time::Instant) -> Instant {
         Instant { std }
     }
@@ -80,9 +80,9 @@ impl Instant {
     /// # Examples
     ///
     /// ```
-    /// use monoio::time::{sleep, Duration, Instant};
+    /// use snowfallio::time::{sleep, Duration, Instant};
     ///
-    /// #[monoio::main(timer_enabled = true)]
+    /// #[snowfallio::main(timer_enabled = true)]
     /// async fn main() {
     ///     let now = Instant::now();
     ///     sleep(Duration::new(0, 50)).await;
@@ -101,9 +101,9 @@ impl Instant {
     /// # Examples
     ///
     /// ```
-    /// use monoio::time::{sleep, Duration, Instant};
+    /// use snowfallio::time::{sleep, Duration, Instant};
     ///
-    /// #[monoio::main(timer_enabled = true)]
+    /// #[snowfallio::main(timer_enabled = true)]
     /// async fn main() {
     ///     let now = Instant::now();
     ///     sleep(Duration::new(0, 10)).await;
@@ -127,9 +127,9 @@ impl Instant {
     /// # Examples
     ///
     /// ```
-    /// use monoio::time::{sleep, Duration, Instant};
+    /// use snowfallio::time::{sleep, Duration, Instant};
     ///
-    /// #[monoio::main(timer_enabled = true)]
+    /// #[snowfallio::main(timer_enabled = true)]
     /// async fn main() {
     ///     let instant = Instant::now();
     ///     let three_secs = Duration::from_millis(30);

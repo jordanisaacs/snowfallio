@@ -22,7 +22,7 @@
 pub mod macros;
 #[cfg(feature = "macros")]
 #[doc(hidden)]
-pub use monoio_macros::select_priv_declare_output_enum;
+pub use snowfallio_macros::select_priv_declare_output_enum;
 #[macro_use]
 mod driver;
 pub(crate) mod builder;
@@ -52,9 +52,9 @@ pub use driver::Driver;
 pub use driver::IoUringDriver;
 #[cfg(all(unix, feature = "legacy"))]
 pub use driver::LegacyDriver;
-#[cfg(feature = "macros")]
-pub use monoio_macros::{main, test, test_all};
 pub use runtime::{spawn, Runtime};
+#[cfg(feature = "macros")]
+pub use snowfallio_macros::{main, test, test_all};
 #[cfg(all(
     unix,
     any(all(target_os = "linux", feature = "iouring"), feature = "legacy")
@@ -68,10 +68,10 @@ pub use {builder::FusionDriver, runtime::FusionRuntime};
 /// Basic usage
 ///
 /// ```no_run
-/// use monoio::fs::File;
+/// use snowfallio::fs::File;
 ///
 /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-///     monoio::start::<monoio::LegacyDriver, _>(async {
+///     snowfallio::start::<snowfallio::LegacyDriver, _>(async {
 ///         // Open a file
 ///         let file = File::open("hello.txt").await?;
 ///
@@ -110,10 +110,10 @@ where
 /// # Examples
 ///
 /// ```no_run
-/// use monoio::fs::File;
+/// use snowfallio::fs::File;
 ///
 /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-///     monoio::start::<monoio::LegacyDriver, _>(async {
+///     snowfallio::start::<snowfallio::LegacyDriver, _>(async {
 ///         // Open a file
 ///         let file = File::open("hello.txt").await?;
 ///

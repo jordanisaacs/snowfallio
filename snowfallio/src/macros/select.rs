@@ -51,10 +51,10 @@
 /// able to run **concurrently** but not in **parallel**. This means all
 /// expressions are run on the same thread and if one branch blocks the thread,
 /// all other expressions will be unable to continue. If parallelism is
-/// required, spawn each async expression using [`monoio::spawn`] and pass the
+/// required, spawn each async expression using [`snowfallio::spawn`] and pass the
 /// join handle to `select!`.
 ///
-/// [`monoio::spawn`]: crate::spawn
+/// [`snowfallio::spawn`]: crate::spawn
 ///
 /// # Fairness
 ///
@@ -67,7 +67,7 @@
 /// the futures in the order they appear from top to bottom. There are a few
 /// reasons you may want this:
 ///
-/// - The random number generation of `monoio::select!` has a non-zero CPU cost
+/// - The random number generation of `snowfallio::select!` has a non-zero CPU cost
 /// - Your futures may interact in a way where known polling order is significant
 ///
 /// But there is an important caveat to this mode. It becomes your
@@ -98,9 +98,9 @@
 ///     // more here
 /// }
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
-///     monoio::select! {
+///     snowfallio::select! {
 ///         _ = do_stuff_async() => {
 ///             println!("do_stuff_async() completed first")
 ///         }
@@ -126,12 +126,12 @@
 /// Using the `biased;` mode to control polling order.
 ///
 /// ```
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() {
 ///     let mut count = 0u8;
 ///
 ///     loop {
-///         monoio::select! {
+///         snowfallio::select! {
 ///             // If you run this example without `biased;`, the polling order is
 ///             // pseudo-random, and the assertions on the value of count will
 ///             // (probably) fail.
@@ -172,19 +172,19 @@
 /// However, there is a potential for the `sleep` completion to be missed.
 ///
 /// ```no_run,should_panic
-/// use monoio::time::{self, Duration};
+/// use snowfallio::time::{self, Duration};
 ///
 /// async fn some_async_work() {
 ///     // do work
 /// }
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     let sleep = time::sleep(Duration::from_millis(50));
-///     monoio::pin!(sleep);
+///     snowfallio::pin!(sleep);
 ///
 ///     while !sleep.is_elapsed() {
-///         monoio::select! {
+///         snowfallio::select! {
 ///             _ = &mut sleep, if !sleep.is_elapsed() => {
 ///                 println!("operation timed out");
 ///             }
@@ -207,20 +207,20 @@
 /// One way to write the above example without the race would be:
 ///
 /// ```
-/// use monoio::time::{self, Duration};
+/// use snowfallio::time::{self, Duration};
 ///
 /// async fn some_async_work() {
 /// # time::sleep(Duration::from_millis(10)).await;
 ///     // do work
 /// }
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     let sleep = time::sleep(Duration::from_millis(50));
-///     monoio::pin!(sleep);
+///     snowfallio::pin!(sleep);
 ///
 ///     loop {
-///         monoio::select! {
+///         snowfallio::select! {
 ///             _ = &mut sleep => {
 ///                 println!("operation timed out");
 ///                 break;
@@ -278,7 +278,7 @@ macro_rules! select {
             $crate::select_priv_declare_output_enum!( ( $($count)* ) );
         }
 
-        // `monoio::macros::support` is a public, but doc(hidden) module
+        // `snowfallio::macros::support` is a public, but doc(hidden) module
         // including a re-export of all types needed by this macro.
         use $crate::macros::support::Future;
         use $crate::macros::support::Pin;

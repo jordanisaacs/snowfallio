@@ -1,6 +1,6 @@
 use std::io;
 
-use monoio::{
+use snowfallio::{
     io::{AsyncReadRent, AsyncWriteRent},
     net::TcpStream,
     BufResult,

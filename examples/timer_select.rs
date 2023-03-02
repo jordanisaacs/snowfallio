@@ -2,23 +2,23 @@
 
 use std::future::Future;
 
-use monoio::{io::Canceller, net::TcpListener, time::Duration};
+use snowfallio::{io::Canceller, net::TcpListener, time::Duration};
 use pin_project_lite::pin_project;
 
-#[monoio::main(enable_timer = true)]
+#[snowfallio::main(enable_timer = true)]
 async fn main() {
     // You can write poll by yourself
-    let fut1 = monoio::time::sleep(Duration::from_secs(1));
-    let fut2 = monoio::time::sleep(Duration::from_secs(20));
+    let fut1 = snowfallio::time::sleep(Duration::from_secs(1));
+    let fut2 = snowfallio::time::sleep(Duration::from_secs(20));
     let dual_select = DualSelect { fut1, fut2 };
 
     dual_select.await;
     println!("manually select returned");
 
     // Or you can use select macro
-    let fut1 = monoio::time::sleep(Duration::from_secs(1));
-    let fut2 = monoio::time::sleep(Duration::from_secs(20));
-    monoio::select! {
+    let fut1 = snowfallio::time::sleep(Duration::from_secs(1));
+    let fut2 = snowfallio::time::sleep(Duration::from_secs(20));
+    snowfallio::select! {
         _ = fut1 => {
             println!("select returned with macro");
         }
@@ -42,12 +42,12 @@ async fn main() {
     // In this case you can sense io readiness. But it is not
     // a good way.
     let canceller = Canceller::new();
-    let timeout_fut = monoio::time::sleep(Duration::from_millis(100));
+    let timeout_fut = snowfallio::time::sleep(Duration::from_millis(100));
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     let io_fut = listener.cancelable_accept(canceller.handle());
-    monoio::pin!(io_fut);
+    snowfallio::pin!(io_fut);
 
-    monoio::select! {
+    snowfallio::select! {
         _ = timeout_fut => {
             println!("accept timeout but not sure!");
             canceller.cancel();

@@ -1,7 +1,7 @@
-use monoio::net::udp::UdpSocket;
+use snowfallio::net::udp::UdpSocket;
 
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn connect() {
     const MSG: &str = "foo bar baz";
 
@@ -22,7 +22,7 @@ async fn connect() {
 }
 
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn send_to() {
     const MSG: &str = "foo bar baz";
 
@@ -60,7 +60,7 @@ async fn send_to() {
 }
 
 #[cfg(unix)]
-#[monoio::test_all(timer_enabled = true)]
+#[snowfallio::test_all(timer_enabled = true)]
 async fn rw_able() {
     const MSG: &str = "foo bar baz";
 
@@ -70,8 +70,8 @@ async fn rw_able() {
     let active = UdpSocket::bind("127.0.0.1:0").unwrap();
 
     assert!(active.writable(false).await.is_ok());
-    monoio::select! {
-        _ = monoio::time::sleep(std::time::Duration::from_millis(50)) => {},
+    snowfallio::select! {
+        _ = snowfallio::time::sleep(std::time::Duration::from_millis(50)) => {},
         _ = passive.readable(false) => {
             panic!("unexpected readable");
         }
@@ -83,15 +83,15 @@ async fn rw_able() {
 }
 
 #[cfg(unix)]
-#[monoio::test_all(timer_enabled = true)]
+#[snowfallio::test_all(timer_enabled = true)]
 async fn cancel_recv_from() {
     let passive = UdpSocket::bind("127.0.0.1:0").unwrap();
-    let canceller = monoio::io::Canceller::new();
+    let canceller = snowfallio::io::Canceller::new();
     let recv = passive.cancelable_recv_from(vec![0; 20], canceller.handle());
-    monoio::pin!(recv);
+    snowfallio::pin!(recv);
 
-    monoio::select! {
-        _ = monoio::time::sleep(std::time::Duration::from_millis(50)) => {
+    snowfallio::select! {
+        _ = snowfallio::time::sleep(std::time::Duration::from_millis(50)) => {
             canceller.cancel();
             assert!(recv.await.0.is_err());
         },

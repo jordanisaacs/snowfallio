@@ -1,17 +1,17 @@
 #[cfg(all(target_os = "linux", feature = "splice"))]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn zero_copy_for_tcp() {
-    use monoio::{
+    use snowfallio::{
         buf::IoBufMut,
         io::{zero_copy, AsyncReadRentExt, AsyncWriteRentExt, Splitable},
         net::TcpStream,
     };
 
     const MSG: &[u8] = b"copy for split";
-    let srv = monoio::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let srv = snowfallio::net::TcpListener::bind("127.0.0.1:0").unwrap();
     let (mut c_tx, mut c_rx) = local_sync::oneshot::channel::<()>();
     let addr = srv.local_addr().unwrap();
-    monoio::spawn(async move {
+    snowfallio::spawn(async move {
         let mut stream = TcpStream::connect(&addr).await.unwrap();
         let (mut rx, mut tx) = stream.split();
         tx.write_all(MSG).await.0.unwrap();
@@ -29,9 +29,9 @@ async fn zero_copy_for_tcp() {
 }
 
 #[cfg(all(target_os = "linux", feature = "splice"))]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn zero_copy_for_uds() {
-    use monoio::{
+    use snowfallio::{
         buf::IoBufMut,
         io::{zero_copy, AsyncReadRentExt, AsyncWriteRentExt, Splitable},
         net::UnixStream,
@@ -43,9 +43,9 @@ async fn zero_copy_for_uds() {
         .tempdir()
         .unwrap();
     let sock_path = dir.path().join("zero_copy.sock");
-    let srv = monoio::net::UnixListener::bind(&sock_path).unwrap();
+    let srv = snowfallio::net::UnixListener::bind(&sock_path).unwrap();
     let (mut c_tx, mut c_rx) = local_sync::oneshot::channel::<()>();
-    monoio::spawn(async move {
+    snowfallio::spawn(async move {
         let mut stream = UnixStream::connect(&sock_path).await.unwrap();
         let (mut rx, mut tx) = stream.split();
         tx.write_all(MSG).await.0.unwrap();

@@ -1,18 +1,18 @@
 //! A example to show how to use UnixStream.
 
 use local_sync::oneshot::channel;
-use monoio::{
+use snowfallio::{
     io::{AsyncReadRent, AsyncWriteRentExt},
     net::{UnixListener, UnixStream},
 };
 
 const ADDRESS: &str = "/tmp/monoio-unix-test.sock";
 
-#[monoio::main]
+#[snowfallio::main]
 async fn main() {
     let (mut tx, rx) = channel::<()>();
 
-    monoio::spawn(async move {
+    snowfallio::spawn(async move {
         tx.closed().await;
         let mut client = UnixStream::connect(ADDRESS).await.unwrap();
         let buf = "hello";

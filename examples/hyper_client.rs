@@ -12,7 +12,7 @@
 
 use std::{future::Future, pin::Pin};
 
-use monoio_compat::TcpStreamCompat;
+use snowfallio_compat::TcpStreamCompat;
 
 #[derive(Clone)]
 struct HyperExecutor;
@@ -23,7 +23,7 @@ where
     F::Output: 'static,
 {
     fn execute(&self, fut: F) {
-        monoio::spawn(fut);
+        snowfallio::spawn(fut);
     }
 }
 
@@ -53,7 +53,7 @@ impl tower_service::Service<hyper::Uri> for HyperConnector {
         #[allow(clippy::type_complexity)]
         let b: Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>> =
             Box::pin(async move {
-                let conn = monoio::net::TcpStream::connect(address).await?;
+                let conn = snowfallio::net::TcpStream::connect(address).await?;
                 let hyper_conn = HyperConnection(TcpStreamCompat::new(conn));
                 Ok(hyper_conn)
             });
@@ -106,7 +106,7 @@ impl hyper::client::connect::Connection for HyperConnection {
 #[allow(clippy::non_send_fields_in_send_ty)]
 unsafe impl Send for HyperConnection {}
 
-#[monoio::main]
+#[snowfallio::main]
 async fn main() {
     println!("Running http client");
     let connector = HyperConnector;

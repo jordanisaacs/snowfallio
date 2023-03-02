@@ -1,6 +1,6 @@
 use std::io;
 
-use monoio::{
+use snowfallio::{
     buf::IoBufMut,
     io::{AsyncReadRent, AsyncWriteRent, AsyncWriteRentExt, Split},
     BufResult,

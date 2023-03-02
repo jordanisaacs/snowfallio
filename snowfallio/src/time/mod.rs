@@ -25,9 +25,9 @@
 //! ```
 //! use std::time::Duration;
 //!
-//! use monoio::time::sleep;
+//! use snowfallio::time::sleep;
 //!
-//! #[monoio::main(timer_enabled = true)]
+//! #[snowfallio::main(timer_enabled = true)]
 //! async fn main() {
 //!     sleep(Duration::from_millis(100)).await;
 //!     println!("100 ms have elapsed");
@@ -37,7 +37,7 @@
 //! Require that an operation takes no more than 1s.
 //!
 //! ```
-//! use monoio::time::{timeout, Duration};
+//! use snowfallio::time::{timeout, Duration};
 //!
 //! async fn long_future() {
 //!     // do work here
@@ -64,14 +64,14 @@
 //! seconds.
 //!
 //! ```
-//! use monoio::time;
+//! use snowfallio::time;
 //!
 //! async fn task_that_takes_a_second() {
 //!     println!("hello");
 //!     time::sleep(time::Duration::from_secs(1)).await
 //! }
 //!
-//! #[monoio::main(timer_enabled = true)]
+//! #[snowfallio::main(timer_enabled = true)]
 //! async fn main() {
 //!     let mut interval = time::interval(time::Duration::from_secs(2));
 //!     for _i in 0..5 {

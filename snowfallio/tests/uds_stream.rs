@@ -1,9 +1,9 @@
 use futures::future::try_join;
-use monoio::io::{AsyncReadRent, AsyncReadRentExt, AsyncWriteRent, AsyncWriteRentExt};
+use snowfallio::io::{AsyncReadRent, AsyncReadRentExt, AsyncWriteRent, AsyncWriteRentExt};
 #[cfg(unix)]
-use monoio::net::{UnixListener, UnixStream};
+use snowfallio::net::{UnixListener, UnixStream};
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn accept_read_write() -> std::io::Result<()> {
     let dir = tempfile::Builder::new()
         .prefix("monoio-uds-tests")
@@ -30,7 +30,7 @@ async fn accept_read_write() -> std::io::Result<()> {
     Ok(())
 }
 #[cfg(unix)]
-#[monoio::test_all]
+#[snowfallio::test_all]
 async fn shutdown() -> std::io::Result<()> {
     let dir = tempfile::Builder::new()
         .prefix("monoio-uds-tests")

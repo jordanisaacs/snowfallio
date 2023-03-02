@@ -17,7 +17,7 @@ use crate::buf::{IoBuf, IoBufMut};
 /// Creating a slice
 ///
 /// ```
-/// use monoio::buf::{IoBuf, IoBufMut};
+/// use snowfallio::buf::{IoBuf, IoBufMut};
 ///
 /// let buf = b"hello world".to_vec();
 /// let slice = buf.slice_mut(..5);
@@ -55,7 +55,7 @@ impl<T> SliceMut<T> {
     /// # Examples
     ///
     /// ```
-    /// use monoio::buf::IoBuf;
+    /// use snowfallio::buf::IoBuf;
     ///
     /// let buf = b"hello world".to_vec();
     /// let slice = buf.slice(1..5);
@@ -72,7 +72,7 @@ impl<T> SliceMut<T> {
     /// # Examples
     ///
     /// ```
-    /// use monoio::buf::IoBuf;
+    /// use snowfallio::buf::IoBuf;
     ///
     /// let buf = b"hello world".to_vec();
     /// let slice = buf.slice(1..5);
@@ -91,7 +91,7 @@ impl<T> SliceMut<T> {
     /// # Examples
     ///
     /// ```
-    /// use monoio::buf::{IoBuf, IoBufMut};
+    /// use snowfallio::buf::{IoBuf, IoBufMut};
     ///
     /// let buf = b"hello world".to_vec();
     /// let slice = buf.slice_mut(..5);
@@ -111,7 +111,7 @@ impl<T> SliceMut<T> {
     /// # Examples
     ///
     /// ```
-    /// use monoio::buf::{IoBuf, IoBufMut};
+    /// use snowfallio::buf::{IoBuf, IoBufMut};
     ///
     /// let buf = b"hello world".to_vec();
     /// let mut slice = buf.slice_mut(..5);
@@ -131,7 +131,7 @@ impl<T> SliceMut<T> {
     /// # Examples
     ///
     /// ```
-    /// use monoio::buf::IoBuf;
+    /// use snowfallio::buf::IoBuf;
     ///
     /// let buf = b"hello world".to_vec();
     /// let slice = buf.slice(..5);

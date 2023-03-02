@@ -30,9 +30,9 @@ use crate::time::{
 /// Wait 100ms and print "100 ms have elapsed".
 ///
 /// ```
-/// use monoio::time::{sleep_until, Duration, Instant};
+/// use snowfallio::time::{sleep_until, Duration, Instant};
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     sleep_until(Instant::now() + Duration::from_millis(100)).await;
 ///     println!("100 ms have elapsed");
@@ -73,9 +73,9 @@ pub fn sleep_until(deadline: Instant) -> Sleep {
 /// Wait 100ms and print "100 ms have elapsed".
 ///
 /// ```
-/// use monoio::time::{sleep, Duration};
+/// use snowfallio::time::{sleep, Duration};
 ///
-/// #[monoio::main(timer_enabled = true)]
+/// #[snowfallio::main(timer_enabled = true)]
 /// async fn main() {
 ///     sleep(Duration::from_millis(100)).await;
 ///     println!("100 ms have elapsed");
@@ -108,27 +108,27 @@ pin_project! {
     /// Wait 100ms and print "100 ms have elapsed".
     ///
     /// ```
-    /// use monoio::time::{sleep, Duration};
+    /// use snowfallio::time::{sleep, Duration};
     ///
-    /// #[monoio::main(timer_enabled = true)]
+    /// #[snowfallio::main(timer_enabled = true)]
     /// async fn main() {
     ///     sleep(Duration::from_millis(100)).await;
     ///     println!("100 ms have elapsed");
     /// }
     /// ```
     ///
-    /// Use with [`select!`]. Pinning the `Sleep` with [`monoio::pin!`] is
+    /// Use with [`select!`]. Pinning the `Sleep` with [`snowfallio::pin!`] is
     /// necessary when the same `Sleep` is selected on multiple times.
     /// ```no_run
-    /// use monoio::time::{self, Duration, Instant};
+    /// use snowfallio::time::{self, Duration, Instant};
     ///
-    /// #[monoio::main(timer_enabled = true)]
+    /// #[snowfallio::main(timer_enabled = true)]
     /// async fn main() {
     ///     let sleep = time::sleep(Duration::from_millis(10));
-    ///     monoio::pin!(sleep);
+    ///     snowfallio::pin!(sleep);
     ///
     ///     loop {
-    ///         monoio::select! {
+    ///         snowfallio::select! {
     ///             () = &mut sleep => {
     ///                 println!("timer elapsed");
     ///                 sleep.as_mut().reset(Instant::now() + Duration::from_millis(50));
@@ -143,7 +143,7 @@ pin_project! {
     /// use std::future::Future;
     /// use std::pin::Pin;
     /// use std::task::{Context, Poll};
-    /// use monoio::time::Sleep;
+    /// use snowfallio::time::Sleep;
     ///
     /// struct HasSleep {
     ///     sleep: Pin<Box<Sleep>>,
@@ -163,7 +163,7 @@ pin_project! {
     /// use std::future::Future;
     /// use std::pin::Pin;
     /// use std::task::{Context, Poll};
-    /// use monoio::time::Sleep;
+    /// use snowfallio::time::Sleep;
     /// use pin_project_lite::pin_project;
     ///
     /// pin_project! {
@@ -183,7 +183,7 @@ pin_project! {
     /// ```
     ///
     /// [`select!`]: ../macro.select.html
-    /// [`monoio::pin!`]: ../macro.pin.html
+    /// [`snowfallio::pin!`]: ../macro.pin.html
     // Alias for old name in 0.2
     #[cfg_attr(docsrs, doc(alias = "Delay"))]
     #[derive(Debug)]
@@ -236,12 +236,12 @@ impl Sleep {
     /// # Example
     ///
     /// ```
-    /// use monoio::time::{Duration, Instant};
+    /// use snowfallio::time::{Duration, Instant};
     ///
-    /// # #[monoio::main(timer_enabled = true)]
+    /// # #[snowfallio::main(timer_enabled = true)]
     /// # async fn main() {
-    /// let sleep = monoio::time::sleep(Duration::from_millis(10));
-    /// monoio::pin!(sleep);
+    /// let sleep = snowfallio::time::sleep(Duration::from_millis(10));
+    /// snowfallio::pin!(sleep);
     ///
     /// sleep
     ///     .as_mut()

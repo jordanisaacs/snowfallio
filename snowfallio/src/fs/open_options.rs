@@ -23,9 +23,9 @@ use crate::{
 /// Opening a file to read:
 ///
 /// ```no_run
-/// use monoio::fs::OpenOptions;
+/// use snowfallio::fs::OpenOptions;
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ///     let file = OpenOptions::new().read(true).open("foo.txt").await?;
 ///     Ok(())
@@ -36,9 +36,9 @@ use crate::{
 /// doesn't exist:
 ///
 /// ```no_run
-/// use monoio::fs::OpenOptions;
+/// use snowfallio::fs::OpenOptions;
 ///
-/// #[monoio::main]
+/// #[snowfallio::main]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ///     let file = OpenOptions::new()
 ///         .read(true)
@@ -71,9 +71,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new().read(true).open("foo.txt").await?;
     ///     Ok(())
@@ -104,9 +104,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new().read(true).open("foo.txt").await?;
     ///     Ok(())
@@ -128,9 +128,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new().write(true).open("foo.txt").await?;
     ///     Ok(())
@@ -160,9 +160,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new().append(true).open("foo.txt").await?;
     ///     Ok(())
@@ -183,9 +183,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new()
     ///         .write(true)
@@ -208,9 +208,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new()
     ///         .write(true)
@@ -247,9 +247,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new()
     ///         .write(true)
@@ -294,9 +294,9 @@ impl OpenOptions {
     /// # Examples
     ///
     /// ```no_run
-    /// use monoio::fs::OpenOptions;
+    /// use snowfallio::fs::OpenOptions;
     ///
-    /// #[monoio::main]
+    /// #[snowfallio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let file = OpenOptions::new().read(true).open("foo.txt").await?;
     ///     Ok(())

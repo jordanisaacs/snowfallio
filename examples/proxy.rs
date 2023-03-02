@@ -1,6 +1,6 @@
 //! An example TCP proxy.
 
-use monoio::{
+use snowfallio::{
     io::{AsyncReadRent, AsyncWriteRent, AsyncWriteRentExt, Splitable},
     net::{TcpListener, TcpStream},
 };
@@ -8,7 +8,7 @@ use monoio::{
 const LISTEN_ADDRESS: &str = "127.0.0.1:50005";
 const TARGET_ADDRESS: &str = "127.0.0.1:50006";
 
-#[monoio::main(entries = 512, timer_enabled = false)]
+#[snowfallio::main(entries = 512, timer_enabled = false)]
 async fn main() {
     let listener = TcpListener::bind(LISTEN_ADDRESS)
         .unwrap_or_else(|_| panic!("[Server] Unable to bind to {LISTEN_ADDRESS}"));
@@ -16,10 +16,10 @@ async fn main() {
         if let Ok((mut in_conn, _addr)) = listener.accept().await {
             let out_conn = TcpStream::connect(TARGET_ADDRESS).await;
             if let Ok(mut out_conn) = out_conn {
-                monoio::spawn(async move {
+                snowfallio::spawn(async move {
                     let (mut in_r, mut in_w) = in_conn.split();
                     let (mut out_r, mut out_w) = out_conn.split();
-                    let _ = monoio::join!(
+                    let _ = snowfallio::join!(
                         copy_one_direction(&mut in_r, &mut out_w),
                         copy_one_direction(&mut out_r, &mut in_w),
                     );
