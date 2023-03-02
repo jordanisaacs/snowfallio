@@ -1,9 +1,9 @@
 [workspace]
 
 members = [
-    "monoio",
-    "monoio-macros",
-    "monoio-compat",
+    "snowfallio",
+    "snowfallio-macros",
+    "snowfallio-compat",
 
     # Internal
     "examples",

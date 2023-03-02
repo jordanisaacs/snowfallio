@@ -1,19 +1,19 @@
 [package]
 authors = ["ChiHai <ihciah@gmail.com>", "XuShuai <dyxushuai@gmail.com>"]
 categories = ["asynchronous", "network-programming"]
-description = "A compat wrapper for monoio."
+description = "A compat wrapper for snowfallio."
 edition = "2021"
 keywords = ["runtime", "iouring", "async"]
 license = "MIT/Apache-2.0"
-name = "monoio-compat"
+name = "snowfallio-compat"
 readme = "README.md"
-repository = "https://github.com/bytedance/monoio"
+repository = "https://github.com/jordanisaacs/snowfallio"
 version = "0.0.9"
 
 [dependencies]
-monoio = {version = "0.0.9", path = "../monoio", default-features = false}
+snowfallio = {version = "0.0.9", path = "../snowfallio", default-features = false}
 reusable-box-future = "0.2"
 tokio = {version = "1", default-features = false, features = ["io-util"]}
 
 [dev-dependencies]
-monoio = {version = "0.0.9", path = "../monoio", features = ["async-cancel", "macros"]}
+snowfallio = {version = "0.0.9", path = "../snowfallio", features = ["async-cancel", "macros"]}
