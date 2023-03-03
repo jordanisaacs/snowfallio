@@ -1,6 +1,6 @@
 //! Use macro to run async main
 
-#[snowfallio::main(entries = 512)]
+#[snowfallio::main(entries = 512, enable_timer = true)]
 async fn main() {
     println!("will sleep about 1 sec");
 

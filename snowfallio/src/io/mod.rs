@@ -12,7 +12,7 @@ pub mod sink;
 pub mod stream;
 
 pub mod as_fd;
-#[cfg(all(target_os = "linux", feature = "splice"))]
+#[cfg(feature = "splice")]
 pub mod splice;
 
 pub use async_buf_read::AsyncBufRead;
@@ -25,7 +25,7 @@ pub use async_write_rent_ext::AsyncWriteRentExt;
 
 mod util;
 pub(crate) use util::operation_canceled;
-#[cfg(all(target_os = "linux", feature = "splice"))]
+#[cfg(feature = "splice")]
 pub use util::zero_copy;
 pub use util::{
     copy, BufReader, BufWriter, CancelHandle, Canceller, OwnedReadHalf, OwnedWriteHalf,

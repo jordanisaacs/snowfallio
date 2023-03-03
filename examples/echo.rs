@@ -8,7 +8,7 @@ use snowfallio::{
     net::{TcpListener, TcpStream},
 };
 
-#[snowfallio::main(driver = "fusion")]
+#[snowfallio::main]
 async fn main() {
     // tracing_subscriber::fmt().with_max_level(tracing::Level::TRACE).init();
     let listener = TcpListener::bind("127.0.0.1:50002").unwrap();

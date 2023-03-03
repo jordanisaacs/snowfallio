@@ -18,7 +18,7 @@ impl EventWaker {
         Self {
             raw: file.as_raw_fd(),
             _file: file,
-            awake: std::sync::atomic::AtomicBool::new(true),
+            awake: core::sync::atomic::AtomicBool::new(true),
         }
     }
 

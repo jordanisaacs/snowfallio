@@ -7,8 +7,8 @@ use snowfallio::{
     io::{AsyncReadRent, AsyncWriteRentExt, Splitable},
     net::TcpStream,
 };
-#[cfg(unix)]
-#[snowfallio::test_all]
+
+#[snowfallio::test]
 async fn split() -> Result<()> {
     const MSG: &[u8] = b"split";
 

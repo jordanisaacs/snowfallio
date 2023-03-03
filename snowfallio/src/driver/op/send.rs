@@ -1,13 +1,7 @@
 use std::{io, net::SocketAddr};
 
-#[cfg(all(target_os = "linux", feature = "iouring"))]
 use io_uring::{opcode, types};
 use socket2::SockAddr;
-#[cfg(all(unix, feature = "legacy"))]
-use {
-    crate::{driver::legacy::ready::Direction, syscall_u32},
-    std::os::unix::prelude::AsRawFd,
-};
 
 use super::{super::shared_fd::SharedFd, Op, OpAble};
 use crate::{buf::IoBuf, BufResult};
@@ -41,7 +35,6 @@ impl<T: IoBuf> Op<Send<T>> {
 }
 
 impl<T: IoBuf> OpAble for Send<T> {
-    #[cfg(all(target_os = "linux", feature = "iouring"))]
     fn uring_op(&mut self) -> io_uring::squeue::Entry {
         #[cfg(feature = "zero-copy")]
         fn zero_copy_flag_guard<T: IoBuf>(buf: &T) -> libc::c_int {
@@ -74,30 +67,6 @@ impl<T: IoBuf> OpAble for Send<T> {
         )
         .flags(flags)
         .build()
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_interest(&self) -> Option<(Direction, usize)> {
-        self.fd
-            .registered_index()
-            .map(|idx| (Direction::Write, idx))
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_call(&mut self) -> io::Result<u32> {
-        let fd = self.fd.as_raw_fd();
-        #[cfg(target_os = "linux")]
-        #[allow(deprecated)]
-        let flags = libc::MSG_NOSIGNAL as _;
-        #[cfg(not(target_os = "linux"))]
-        let flags = 0;
-
-        syscall_u32!(send(
-            fd,
-            self.buf.read_ptr() as _,
-            self.buf.bytes_init(),
-            flags
-        ))
     }
 }
 
@@ -153,21 +122,7 @@ impl<T: IoBuf> Op<SendMsg<T>> {
 }
 
 impl<T: IoBuf> OpAble for SendMsg<T> {
-    #[cfg(all(target_os = "linux", feature = "iouring"))]
     fn uring_op(&mut self) -> io_uring::squeue::Entry {
         opcode::SendMsg::new(types::Fd(self.fd.raw_fd()), &mut self.info.2 as *mut _).build()
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_interest(&self) -> Option<(Direction, usize)> {
-        self.fd
-            .registered_index()
-            .map(|idx| (Direction::Write, idx))
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_call(&mut self) -> io::Result<u32> {
-        let fd = self.fd.as_raw_fd();
-        syscall_u32!(sendmsg(fd, &mut self.info.2 as *mut _, 0))
     }
 }

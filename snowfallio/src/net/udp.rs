@@ -3,7 +3,10 @@
 use std::{
     io,
     net::{SocketAddr, ToSocketAddrs},
-    os::fd::{AsRawFd, FromRawFd, IntoRawFd},
+    os::{
+        fd::{AsRawFd, FromRawFd},
+        unix::prelude::IntoRawFd,
+    },
 };
 
 use crate::{
@@ -34,16 +37,6 @@ impl UdpSocket {
         Self { fd }
     }
 
-    #[cfg(all(unix, feature = "legacy"))]
-    fn set_non_blocking(_socket: &socket2::Socket) -> io::Result<()> {
-        crate::driver::CURRENT.with(|x| match x {
-            // TODO: windows ioring support
-            #[cfg(all(target_os = "linux", feature = "iouring"))]
-            crate::driver::Inner::Uring(_) => Ok(()),
-            crate::driver::Inner::Legacy(_) => _socket.set_nonblocking(true),
-        })
-    }
-
     /// Creates a UDP socket from the given address.
     pub fn bind<A: ToSocketAddrs>(addr: A) -> io::Result<Self> {
         let addr = addr
@@ -57,16 +50,11 @@ impl UdpSocket {
         };
         let socket =
             socket2::Socket::new(domain, socket2::Type::DGRAM, Some(socket2::Protocol::UDP))?;
-        #[cfg(all(unix, feature = "legacy"))]
-        Self::set_non_blocking(&socket)?;
 
         let addr = socket2::SockAddr::from(addr);
         socket.bind(&addr)?;
 
-        #[cfg(unix)]
-        let fd = SharedFd::new(socket.into_raw_fd())?;
-        #[cfg(windows)]
-        let fd = unimplemented!();
+        let fd = SharedFd::new(socket.into_raw_fd());
 
         Ok(Self::from_shared_fd(fd))
     }
@@ -133,14 +121,8 @@ impl UdpSocket {
     }
 
     /// Creates new `UdpSocket` from a `std::net::UdpSocket`.
-    pub fn from_std(socket: std::net::UdpSocket) -> io::Result<Self> {
-        match SharedFd::new(socket.as_raw_fd()) {
-            Ok(shared) => {
-                socket.into_raw_fd();
-                Ok(Self::from_shared_fd(shared))
-            }
-            Err(e) => Err(e),
-        }
+    pub fn from_std(socket: std::net::UdpSocket) -> Self {
+        Self::from_shared_fd(SharedFd::new(socket.into_raw_fd()))
     }
 
     /// Set value for the `SO_REUSEADDR` option on this socket.

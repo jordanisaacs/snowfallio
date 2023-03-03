@@ -1,12 +1,11 @@
 use std::net::{IpAddr, SocketAddr};
 
 use snowfallio::net::{TcpListener, TcpStream};
-#[cfg(unix)]
 
 macro_rules! test_accept {
     ($(($ident:ident, $target:expr),)*) => {
         $(
-            #[snowfallio::test_all]
+            #[snowfallio::test]
             async fn $ident() {
                 let listener = TcpListener::bind($target).unwrap();
                 let addr = listener.local_addr().unwrap();
@@ -22,7 +21,6 @@ macro_rules! test_accept {
         )*
     }
 }
-#[cfg(unix)]
 
 test_accept! {
     (ip_str, "127.0.0.1:0"),

@@ -1,11 +1,7 @@
-#[cfg(unix)]
-use libc::getegid;
-#[cfg(unix)]
-use libc::geteuid;
-#[cfg(unix)]
+use libc::{getegid, geteuid};
 use snowfallio::net::UnixStream;
-#[cfg(unix)]
-#[snowfallio::test_all]
+
+#[snowfallio::test]
 async fn test_socket_pair() {
     let (a, b) = UnixStream::pair().unwrap();
     let cred_a = a.peer_cred().unwrap();

@@ -4,13 +4,7 @@ use std::{
     net::{Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
-#[cfg(all(target_os = "linux", feature = "iouring"))]
 use io_uring::{opcode, types};
-#[cfg(all(unix, feature = "legacy"))]
-use {
-    crate::{driver::legacy::ready::Direction, syscall_u32},
-    std::os::unix::prelude::AsRawFd,
-};
 
 use super::{super::shared_fd::SharedFd, Op, OpAble};
 use crate::{buf::IoBufMut, BufResult};
@@ -54,7 +48,6 @@ impl<T: IoBufMut> Op<Recv<T>> {
 }
 
 impl<T: IoBufMut> OpAble for Recv<T> {
-    #[cfg(all(target_os = "linux", feature = "iouring"))]
     fn uring_op(&mut self) -> io_uring::squeue::Entry {
         opcode::Recv::new(
             types::Fd(self.fd.raw_fd()),
@@ -62,22 +55,6 @@ impl<T: IoBufMut> OpAble for Recv<T> {
             self.buf.bytes_total() as _,
         )
         .build()
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_interest(&self) -> Option<(Direction, usize)> {
-        self.fd.registered_index().map(|idx| (Direction::Read, idx))
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_call(&mut self) -> io::Result<u32> {
-        let fd = self.fd.as_raw_fd();
-        syscall_u32!(recv(
-            fd,
-            self.buf.write_ptr() as _,
-            self.buf.bytes_total().min(u32::MAX as usize),
-            0
-        ))
     }
 }
 
@@ -165,19 +142,7 @@ impl<T: IoBufMut> Op<RecvMsg<T>> {
 }
 
 impl<T: IoBufMut> OpAble for RecvMsg<T> {
-    #[cfg(all(target_os = "linux", feature = "iouring"))]
     fn uring_op(&mut self) -> io_uring::squeue::Entry {
         opcode::RecvMsg::new(types::Fd(self.fd.raw_fd()), &mut self.info.2 as *mut _).build()
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_interest(&self) -> Option<(Direction, usize)> {
-        self.fd.registered_index().map(|idx| (Direction::Read, idx))
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_call(&mut self) -> io::Result<u32> {
-        let fd = self.fd.as_raw_fd();
-        syscall_u32!(recvmsg(fd, &mut self.info.2 as *mut _, 0))
     }
 }

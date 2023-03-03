@@ -1,12 +1,11 @@
 use std::net::{IpAddr, SocketAddr};
 
 use snowfallio::net::{TcpListener, TcpStream};
-#[cfg(unix)]
 
 macro_rules! test_connect_ip {
     ($(($ident:ident, $target:expr, $addr_f:path),)*) => {
         $(
-            #[snowfallio::test_all]
+            #[snowfallio::test]
             async fn $ident() {
                 let listener = TcpListener::bind($target).unwrap();
                 let addr = listener.local_addr().unwrap();
@@ -29,18 +28,16 @@ macro_rules! test_connect_ip {
         )*
     }
 }
-#[cfg(unix)]
 
 test_connect_ip! {
     (connect_v4, "127.0.0.1:0", SocketAddr::is_ipv4),
     (connect_v6, "[::1]:0", SocketAddr::is_ipv6),
 }
-#[cfg(unix)]
 
 macro_rules! test_connect {
     ($(($ident:ident, $mapping:tt),)*) => {
         $(
-            #[snowfallio::test_all]
+            #[snowfallio::test]
             async fn $ident() {
                 let listener = TcpListener::bind("127.0.0.1:0").unwrap();
                 #[allow(clippy::redundant_closure_call)]
@@ -59,7 +56,6 @@ macro_rules! test_connect {
         )*
     }
 }
-#[cfg(unix)]
 
 test_connect! {
     (ip_string, (|listener: &TcpListener| {
@@ -84,8 +80,8 @@ test_connect! {
         ("127.0.0.1", addr.port())
     })),
 }
-#[cfg(unix)]
-#[snowfallio::test_all(timer_enabled = true)]
+
+#[snowfallio::test(timer_enabled = true)]
 async fn connect_timeout_dst() {
     let drop_flag = DropFlag::default();
     let drop_flag_copy = drop_flag.clone();
@@ -103,14 +99,13 @@ async fn connect_timeout_dst() {
     }
     drop_flag.assert_dropped();
 }
-#[cfg(unix)]
-#[snowfallio::test_all]
+
+#[snowfallio::test]
 async fn connect_invalid_dst() {
     assert!(TcpStream::connect("127.0.0.1:1").await.is_err());
 }
 
-#[cfg(unix)]
-#[snowfallio::test_all(timer_enabled = true)]
+#[snowfallio::test(timer_enabled = true)]
 async fn cancel_read() {
     use snowfallio::io::CancelableAsyncReadRent;
 
@@ -127,8 +122,7 @@ async fn cancel_read() {
     assert!(res.is_err());
 }
 
-#[cfg(unix)]
-#[snowfallio::test_all(timer_enabled = true)]
+#[snowfallio::test(timer_enabled = true)]
 async fn cancel_select() {
     use snowfallio::io::CancelableAsyncReadRent;
 

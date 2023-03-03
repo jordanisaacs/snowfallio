@@ -1,20 +1,12 @@
 use std::{ffi::CString, io, path::Path};
 
 pub(super) fn cstr(p: &Path) -> io::Result<CString> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::ffi::OsStrExt;
-        Ok(CString::new(p.as_os_str().as_bytes())?)
-    }
-    #[cfg(windows)]
-    {
-        unimplemented!()
-    }
+    use std::os::unix::ffi::OsStrExt;
+    Ok(CString::new(p.as_os_str().as_bytes())?)
 }
 
 // Convert Duration to Timespec
 // It's strange that io_uring does not impl From<Duration> for Timespec.
-#[cfg(all(target_os = "linux", feature = "iouring"))]
 pub(super) fn timespec(duration: std::time::Duration) -> io_uring::types::Timespec {
     io_uring::types::Timespec::new()
         .sec(duration.as_secs())
@@ -22,7 +14,6 @@ pub(super) fn timespec(duration: std::time::Duration) -> io_uring::types::Timesp
 }
 
 /// Do syscall and return Result<T, std::io::Error>
-#[cfg(unix)]
 #[macro_export]
 macro_rules! syscall {
     ($fn: ident ( $($arg: expr),* $(,)* ) ) => {{
@@ -32,14 +23,6 @@ macro_rules! syscall {
         } else {
             Ok(res)
         }
-    }};
-}
-
-#[cfg(windows)]
-#[macro_export]
-macro_rules! syscall {
-    ($fn: ident ( $($arg: expr),* $(,)* ) ) => {{
-        unimplemented!()
     }};
 }
 
@@ -54,12 +37,4 @@ macro_rules! syscall_u32 {
             Ok(res as u32)
         }
     }};
-}
-
-#[cfg(all(
-    not(all(target_os = "linux", feature = "iouring")),
-    not(feature = "legacy")
-))]
-pub(crate) fn feature_panic() -> ! {
-    panic!("one of iouring and legacy features must be enabled");
 }

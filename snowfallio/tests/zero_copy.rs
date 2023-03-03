@@ -1,5 +1,5 @@
-#[cfg(all(target_os = "linux", feature = "splice"))]
-#[snowfallio::test_all]
+#[cfg(feature = "splice")]
+#[snowfallio::test]
 async fn zero_copy_for_tcp() {
     use snowfallio::{
         buf::IoBufMut,
@@ -28,8 +28,8 @@ async fn zero_copy_for_tcp() {
     c_tx.closed().await;
 }
 
-#[cfg(all(target_os = "linux", feature = "splice"))]
-#[snowfallio::test_all]
+#[cfg(feature = "splice")]
+#[snowfallio::test]
 async fn zero_copy_for_uds() {
     use snowfallio::{
         buf::IoBufMut,

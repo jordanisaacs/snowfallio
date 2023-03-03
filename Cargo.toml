@@ -3,9 +3,7 @@
 members = [
     "snowfallio",
     "snowfallio-macros",
-    "snowfallio-compat",
 
     # Internal
     "examples",
-    "examples/tokio-io-compat"
 ]

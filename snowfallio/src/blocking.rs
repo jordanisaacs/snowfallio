@@ -119,8 +119,8 @@ where
 }
 
 /// DefaultThreadPool is a simple wrapped `threadpool::ThreadPool` that implememt
-/// `snowfallio::blocking::ThreadPool`. You may use this implementation, or you can use your own thread
-/// pool implementation.
+/// `snowfallio::blocking::ThreadPool`. You may use this implementation, or you can use your own
+/// thread pool implementation.
 pub struct DefaultThreadPool {
     pool: ThreadPoolImpl,
 }
@@ -213,7 +213,7 @@ mod tests {
     #[test]
     fn hello_blocking() {
         let shared_pool = Arc::new(NaiveThreadPool);
-        let mut rt = crate::RuntimeBuilder::<crate::FusionDriver>::new()
+        let mut rt = crate::RuntimeBuilder::<crate::driver::IoUringDriver>::new()
             .attach_thread_pool(shared_pool)
             .enable_timer()
             .build()
@@ -237,7 +237,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn blocking_panic() {
-        let mut rt = crate::RuntimeBuilder::<crate::FusionDriver>::new()
+        let mut rt = crate::RuntimeBuilder::<crate::driver::IoUringDriver>::new()
             .with_blocking_strategy(crate::blocking::BlockingStrategy::Panic)
             .enable_timer()
             .build()
@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn blocking_current() {
-        let mut rt = crate::RuntimeBuilder::<crate::FusionDriver>::new()
+        let mut rt = crate::RuntimeBuilder::<crate::driver::IoUringDriver>::new()
             .with_blocking_strategy(crate::blocking::BlockingStrategy::ExecuteLocal)
             .enable_timer()
             .build()
@@ -273,7 +273,7 @@ mod tests {
     #[test]
     fn drop_task() {
         let shared_pool = Arc::new(FakeThreadPool);
-        let mut rt = crate::RuntimeBuilder::<crate::FusionDriver>::new()
+        let mut rt = crate::RuntimeBuilder::<crate::driver::IoUringDriver>::new()
             .attach_thread_pool(shared_pool)
             .enable_timer()
             .build()
@@ -287,7 +287,7 @@ mod tests {
     #[test]
     fn default_pool() {
         let shared_pool = Arc::new(DefaultThreadPool::new(3));
-        let mut rt = crate::RuntimeBuilder::<crate::FusionDriver>::new()
+        let mut rt = crate::RuntimeBuilder::<crate::driver::IoUringDriver>::new()
             .attach_thread_pool(shared_pool)
             .enable_timer()
             .build()

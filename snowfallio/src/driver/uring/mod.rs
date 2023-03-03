@@ -24,7 +24,7 @@ mod lifecycle;
 #[cfg(feature = "sync")]
 mod waker;
 #[cfg(feature = "sync")]
-pub(crate) use waker::UnparkHandle;
+pub use waker::UnparkHandle;
 
 #[allow(unused)]
 pub(crate) const CANCEL_USERDATA: u64 = u64::MAX;
@@ -261,7 +261,7 @@ impl Driver for IoUringDriver {
     /// Enter the driver context. This enables using uring types.
     fn with<R>(&self, f: impl FnOnce() -> R) -> R {
         // TODO(ihciah): remove clone
-        let inner = Inner::Uring(self.inner.clone());
+        let inner = Inner(self.inner.clone());
         CURRENT.set(&inner, f)
     }
 
@@ -350,7 +350,7 @@ impl UringInner {
         }
 
         // Create the operation
-        let mut op = Self::new_op(data, inner, Inner::Uring(this.clone()));
+        let mut op = Self::new_op(data, inner, Inner(this.clone()));
 
         // Configure the SQE
         let data_mut = unsafe { op.data.as_mut().unwrap_unchecked() };

@@ -8,8 +8,7 @@ use snowfallio::{
 };
 
 fn main() {
-    println!("Will run with LegacyDriver(you must enable legacy feature)");
-    run::<snowfallio::LegacyDriver>();
+    run::<snowfallio::IoUringDriver>();
 }
 
 fn run<D>()

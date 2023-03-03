@@ -47,19 +47,13 @@ use std::future::Future;
 #[cfg(feature = "sync")]
 pub use blocking::spawn_blocking;
 pub use builder::{Buildable, RuntimeBuilder};
-pub use driver::Driver;
-#[cfg(all(target_os = "linux", feature = "iouring"))]
-pub use driver::IoUringDriver;
-#[cfg(all(unix, feature = "legacy"))]
-pub use driver::LegacyDriver;
+pub use driver::{Driver, IoUringDriver};
 pub use runtime::{spawn, Runtime};
 #[cfg(feature = "macros")]
-pub use snowfallio_macros::{main, test, test_all};
-#[cfg(all(
-    unix,
-    any(all(target_os = "linux", feature = "iouring"), feature = "legacy")
-))]
-pub use {builder::FusionDriver, runtime::FusionRuntime};
+pub use snowfallio_macros::{main, test};
+
+#[cfg(not(target_os = "linux"))]
+compile_error!("only linux is supported");
 
 /// Start a monoio runtime.
 ///
@@ -71,7 +65,7 @@ pub use {builder::FusionDriver, runtime::FusionRuntime};
 /// use snowfallio::fs::File;
 ///
 /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-///     snowfallio::start::<snowfallio::LegacyDriver, _>(async {
+///     snowfallio::start::<snowfallio::IoUringDriver, _>(async {
 ///         // Open a file
 ///         let file = File::open("hello.txt").await?;
 ///
@@ -113,7 +107,7 @@ where
 /// use snowfallio::fs::File;
 ///
 /// fn main() -> Result<(), Box<dyn std::error::Error>> {
-///     snowfallio::start::<snowfallio::LegacyDriver, _>(async {
+///     snowfallio::start::<snowfallio::IoUringDriver, _>(async {
 ///         // Open a file
 ///         let file = File::open("hello.txt").await?;
 ///

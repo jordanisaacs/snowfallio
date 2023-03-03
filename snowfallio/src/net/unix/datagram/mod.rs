@@ -4,7 +4,7 @@ use std::{
     io,
     os::unix::{
         net::UnixDatagram as StdUnixDatagram,
-        prelude::{AsRawFd, IntoRawFd, RawFd},
+        prelude::{AsRawFd, RawFd},
     },
     path::Path,
 };
@@ -30,18 +30,18 @@ impl UnixDatagram {
 
     /// Creates a Unix datagram socket bound to the given path.
     pub fn bind<P: AsRef<Path>>(path: P) -> io::Result<Self> {
-        StdUnixDatagram::bind(path).and_then(Self::from_std)
+        StdUnixDatagram::bind(path).map(Self::from_std)
     }
 
     /// Creates a new `UnixDatagram` which is not bound to any address.
     pub fn unbound() -> io::Result<Self> {
-        StdUnixDatagram::unbound().and_then(Self::from_std)
+        StdUnixDatagram::unbound().map(Self::from_std)
     }
 
     /// Creates an unnamed pair of connected sockets.
     pub fn pair() -> io::Result<(Self, Self)> {
         let (a, b) = pair(libc::SOCK_DGRAM)?;
-        Ok((Self::from_std(a)?, Self::from_std(b)?))
+        Ok((Self::from_std(a), Self::from_std(b)))
     }
 
     /// Connects the socket to the specified address.
@@ -62,7 +62,7 @@ impl UnixDatagram {
         socklen: libc::socklen_t,
     ) -> io::Result<Self> {
         let socket = new_socket(libc::AF_UNIX, libc::SOCK_STREAM)?;
-        let op = Op::connect_unix(SharedFd::new(socket)?, sockaddr, socklen)?;
+        let op = Op::connect_unix(SharedFd::new(socket), sockaddr, socklen)?;
         let completion = op.await;
         completion.meta.result?;
 
@@ -70,14 +70,8 @@ impl UnixDatagram {
     }
 
     /// Creates new `UnixDatagram` from a `std::os::unix::net::UnixDatagram`.
-    pub fn from_std(datagram: StdUnixDatagram) -> io::Result<Self> {
-        match SharedFd::new(datagram.as_raw_fd()) {
-            Ok(shared) => {
-                datagram.into_raw_fd();
-                Ok(Self::from_shared_fd(shared))
-            }
-            Err(e) => Err(e),
-        }
+    pub fn from_std(datagram: StdUnixDatagram) -> Self {
+        Self::from_shared_fd(SharedFd::new(datagram.as_raw_fd()))
     }
 
     /// Returns the socket address of the local half of this connection.

@@ -19,7 +19,7 @@ mod recv;
 mod send;
 mod write;
 
-#[cfg(all(target_os = "linux", feature = "splice"))]
+#[cfg(feature = "splice")]
 mod splice;
 
 /// In-flight operation
@@ -50,41 +50,7 @@ pub(crate) struct CompletionMeta {
 }
 
 pub(crate) trait OpAble {
-    #[cfg(all(target_os = "linux", feature = "iouring"))]
     fn uring_op(&mut self) -> io_uring::squeue::Entry;
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_interest(&self) -> Option<(super::legacy::ready::Direction, usize)>;
-    #[cfg(all(unix, feature = "legacy"))]
-    fn legacy_call(&mut self) -> io::Result<u32>;
-}
-
-/// If legacy is enabled and iouring is not, we can expose io interface in a poll-like way.
-/// This can provide better compatibility for crates programmed in poll-like way.
-#[cfg(all(unix, feature = "legacy"))]
-pub(crate) trait PollLegacy {
-    fn poll_legacy(&mut self, cx: &mut std::task::Context<'_>) -> std::task::Poll<CompletionMeta>;
-}
-
-#[cfg(all(unix, feature = "legacy"))]
-impl<T> PollLegacy for T
-where
-    T: OpAble,
-{
-    fn poll_legacy(&mut self, _cx: &mut std::task::Context<'_>) -> std::task::Poll<CompletionMeta> {
-        #[cfg(all(feature = "iouring", feature = "tokio-compat"))]
-        unsafe {
-            extern "C" {
-                #[link_name = "tokio-compat can only be enabled when legacy feature is enabled and \
-                               iouring is not"]
-                fn trigger() -> !;
-            }
-            trigger()
-        }
-
-        #[cfg(not(all(feature = "iouring", feature = "tokio-compat")))]
-        driver::CURRENT.with(|this| this.poll_op(self, 0, _cx))
-    }
 }
 
 impl<T> Op<T> {
@@ -116,25 +82,7 @@ impl<T> Op<T> {
     where
         T: OpAble,
     {
-        #[cfg(all(unix, feature = "legacy"))]
-        if is_legacy() {
-            return if let Some((dir, id)) = self.data.as_ref().unwrap().legacy_interest() {
-                OpCanceller {
-                    index: id,
-                    direction: Some(dir),
-                }
-            } else {
-                OpCanceller {
-                    index: 0,
-                    direction: None,
-                }
-            };
-        }
-        OpCanceller {
-            index: self.index,
-            #[cfg(all(unix, feature = "legacy"))]
-            direction: None,
-        }
+        OpCanceller { index: self.index }
     }
 }
 
@@ -161,22 +109,9 @@ impl<T> Drop for Op<T> {
     }
 }
 
-#[allow(unused)]
-#[cfg(not(target_os = "linux"))]
-pub(crate) fn is_legacy() -> bool {
-    true
-}
-
-#[cfg(target_os = "linux")]
-pub(crate) fn is_legacy() -> bool {
-    super::CURRENT.with(|inner| inner.is_legacy())
-}
-
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub(crate) struct OpCanceller {
     pub(super) index: usize,
-    #[cfg(all(unix, feature = "legacy"))]
-    pub(super) direction: Option<super::legacy::ready::Direction>,
 }
 
 impl OpCanceller {

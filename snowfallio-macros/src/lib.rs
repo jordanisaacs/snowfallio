@@ -11,26 +11,14 @@ mod entry;
 mod select;
 
 use proc_macro::TokenStream;
-#[cfg(unix)]
 #[proc_macro_attribute]
 pub fn main(args: TokenStream, item: TokenStream) -> TokenStream {
     entry::main(args, item)
 }
 
-#[cfg(windows)]
-#[proc_macro_attribute]
-pub fn main(_args: TokenStream, _item: TokenStream) -> TokenStream {
-    unimplemented!()
-}
-
 #[proc_macro_attribute]
 pub fn test(args: TokenStream, item: TokenStream) -> TokenStream {
     entry::test(args, item)
-}
-
-#[proc_macro_attribute]
-pub fn test_all(args: TokenStream, item: TokenStream) -> TokenStream {
-    entry::test_all(args, item)
 }
 
 /// Implementation detail of the `select!` macro. This macro is **not** intended

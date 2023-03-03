@@ -1,8 +1,8 @@
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, RawFd};
-#[cfg(windows)]
-use std::os::windows::io::{AsRawHandle, RawHandle};
-use std::{io, path::Path};
+use std::{
+    io,
+    os::unix::io::{AsRawFd, RawFd},
+    path::Path,
+};
 
 use crate::{
     buf::{IoBuf, IoBufMut},
@@ -59,7 +59,6 @@ pub struct File {
 }
 
 impl File {
-    #[cfg(unix)]
     /// Attempts to open a file in read-only mode.
     ///
     /// See the [`OpenOptions::open`] method for more details.
@@ -87,7 +86,6 @@ impl File {
         OpenOptions::new().read(true).open(path).await
     }
 
-    #[cfg(unix)]
     /// Opens a file in write-only mode.
     ///
     /// This function will create a file if it does not exist,
@@ -478,16 +476,8 @@ impl File {
     }
 }
 
-#[cfg(unix)]
 impl AsRawFd for File {
     fn as_raw_fd(&self) -> RawFd {
         self.fd.raw_fd()
-    }
-}
-
-#[cfg(windows)]
-impl AsRawHandle for File {
-    fn as_raw_handle(&self) -> RawHandle {
-        self.fd.raw_handle()
     }
 }

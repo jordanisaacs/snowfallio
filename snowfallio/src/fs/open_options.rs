@@ -57,9 +57,7 @@ pub struct OpenOptions {
     truncate: bool,
     create: bool,
     create_new: bool,
-    #[cfg(unix)]
     pub(crate) mode: libc::mode_t,
-    #[cfg(unix)]
     pub(crate) custom_flags: libc::c_int,
 }
 
@@ -89,9 +87,7 @@ impl OpenOptions {
             truncate: false,
             create: false,
             create_new: false,
-            #[cfg(unix)]
             mode: 0o666,
-            #[cfg(unix)]
             custom_flags: 0,
         }
     }
@@ -264,7 +260,6 @@ impl OpenOptions {
         self
     }
 
-    #[cfg(unix)]
     /// Opens a file at `path` with the options specified by `self`.
     ///
     /// # Errors
@@ -315,7 +310,7 @@ impl OpenOptions {
         let completion = op.await;
 
         // The file is open
-        Ok(File::from_shared_fd(SharedFd::new_without_register(
+        Ok(File::from_shared_fd(SharedFd::new(
             completion.meta.result? as _,
         )))
     }
@@ -356,7 +351,6 @@ impl OpenOptions {
     }
 }
 
-#[cfg(unix)]
 impl OpenOptionsExt for OpenOptions {
     fn mode(&mut self, mode: u32) -> &mut Self {
         self.mode = mode as libc::mode_t;

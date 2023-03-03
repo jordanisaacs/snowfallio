@@ -2,8 +2,7 @@ use snowfallio::{
     io::{self, AsyncReadRentExt, AsyncWriteRentExt, Splitable},
     net::{TcpListener, TcpStream},
 };
-#[cfg(unix)]
-#[snowfallio::test_all]
+#[snowfallio::test]
 async fn echo_server() {
     const ITER: usize = 1024;
 
@@ -41,7 +40,8 @@ async fn echo_server() {
             buf_vec_to_write = Some(raw_vec);
 
             // readv
-            let buf_vec: snowfallio::buf::VecBuf = vec![vec![0; 3], vec![0; iov_msg.len() - 3]].into();
+            let buf_vec: snowfallio::buf::VecBuf =
+                vec![vec![0; 3], vec![0; iov_msg.len() - 3]].into();
             let (res, buf_vec) = stream.read_vectored_exact(buf_vec).await;
             assert!(res.is_ok());
             assert_eq!(res.unwrap(), iov_msg.len());
@@ -62,8 +62,7 @@ async fn echo_server() {
     assert!(rx.await.is_ok());
 }
 
-#[cfg(unix)]
-#[snowfallio::test_all(timer_enabled = true)]
+#[snowfallio::test(timer_enabled = true)]
 async fn rw_able() {
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     let listener_addr = listener.local_addr().unwrap();

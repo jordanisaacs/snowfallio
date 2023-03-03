@@ -8,8 +8,8 @@ use snowfallio::{
     net::{TcpListener, TcpStream},
     try_join,
 };
-#[cfg(unix)]
-#[snowfallio::test_all]
+
+#[snowfallio::test]
 async fn split() -> Result<()> {
     const MSG: &[u8] = b"split";
 
@@ -49,8 +49,8 @@ async fn split() -> Result<()> {
 
     Ok(())
 }
-#[cfg(unix)]
-#[snowfallio::test_all(enable_timer = true)]
+
+#[snowfallio::test(enable_timer = true)]
 async fn reunite() -> Result<()> {
     let listener = net::TcpListener::bind("127.0.0.1:0")?;
     let addr = listener.local_addr()?;
@@ -76,10 +76,9 @@ async fn reunite() -> Result<()> {
     handle.join().unwrap();
     Ok(())
 }
-#[cfg(unix)]
 
 /// Test that dropping the write half actually closes the stream.
-#[snowfallio::test_all(enable_timer = true, entries = 1024)]
+#[snowfallio::test(enable_timer = true, entries = 1024)]
 async fn drop_write() -> Result<()> {
     const MSG: &[u8] = b"split";
 

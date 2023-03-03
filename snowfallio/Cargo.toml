@@ -32,22 +32,7 @@ tokio = {version = "1", default-features = false, optional = true}
 tracing = {version = "0.1", default-features = false, features = [
   "std",
 ], optional = true}
-
-# windows dependencies
-[target.'cfg(windows)'.dependencies]
-windows = {version = "0.43.0", features = [
-  "Data_Xml_Dom",
-  "Win32_Foundation",
-  "Win32_Security",
-  "Win32_System_Threading",
-  "Win32_UI_WindowsAndMessaging",
-]}
-
-# unix dependencies
-[target.'cfg(unix)'.dependencies]
 nix = {version = "0.25", optional = true}
-
-[target.'cfg(target_os = "linux")'.dependencies]
 io-uring = {version = "0.5", features = ["unstable"]}
 
 [dev-dependencies]
@@ -71,11 +56,5 @@ sync = ["flume", "threadpool"]
 utils = ["nix"]
 # enable debug if you want to know what runtime does
 debug = ["tracing"]
-# enable legacy driver support(will make snowfallio available for older kernel and macOS)
-legacy = ["mio"]
-# iouring support
-iouring = []
-# tokio-compatiable(only have effect when legacy is enabled and iouring is not)
-tokio-compat = ["tokio"]
 # by default both iouring and legacy are enabled
-default = ["async-cancel", "bytes", "iouring", "legacy", "macros", "utils"]
+default = ["async-cancel", "bytes", "macros", "utils"]

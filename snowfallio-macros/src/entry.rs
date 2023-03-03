@@ -9,21 +9,12 @@ struct FinalConfig {
     entries: Option<u32>,
     timer_enabled: Option<bool>,
     threads: Option<u32>,
-    driver: DriverType,
 }
 
 struct Configuration {
     entries: Option<(u32, Span)>,
     timer_enabled: Option<(bool, Span)>,
     threads: Option<(u32, Span)>,
-    driver: Option<(DriverType, Span)>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum DriverType {
-    Legacy,
-    Uring,
-    Fusion,
 }
 
 impl Configuration {
@@ -32,18 +23,7 @@ impl Configuration {
             entries: None,
             timer_enabled: None,
             threads: None,
-            driver: None,
         }
-    }
-
-    fn set_driver(&mut self, driver: syn::Lit, span: Span) -> Result<(), syn::Error> {
-        if self.driver.is_some() {
-            return Err(syn::Error::new(span, "`driver` set multiple times."));
-        }
-
-        let driver = parse_driver(driver, span, "driver")?;
-        self.driver = Some((driver, span));
-        Ok(())
     }
 
     fn set_threads(&mut self, threads: syn::Lit, span: Span) -> Result<(), syn::Error> {
@@ -87,7 +67,6 @@ impl Configuration {
             entries: self.entries.map(|(e, _)| e),
             timer_enabled: self.timer_enabled.map(|(t, _)| t),
             threads: self.threads.map(|(t, _)| t),
-            driver: self.driver.map(|(d, _)| d).unwrap_or(DriverType::Fusion),
         })
     }
 }
@@ -117,20 +96,6 @@ fn parse_string(lit: syn::Lit, span: Span, field: &str) -> Result<String, syn::E
         _ => Err(syn::Error::new(
             span,
             format!("Failed to parse value of `{field}` as string."),
-        )),
-    }
-}
-
-#[allow(unused)]
-fn parse_driver(lit: syn::Lit, span: Span, field: &str) -> Result<DriverType, syn::Error> {
-    let val = parse_string(lit, span, field)?;
-    match val.as_str() {
-        "legacy" => Ok(DriverType::Legacy),
-        "uring" | "io_uring" | "iouring" => Ok(DriverType::Uring),
-        "fusion" | "auto" | "detect" => Ok(DriverType::Fusion),
-        _ => Err(syn::Error::new(
-            span,
-            format!("Failed to parse value of `{field}` as DriverType."),
         )),
     }
 }
@@ -178,10 +143,6 @@ fn parse_knobs(
                         syn::spanned::Spanned::span(&namevalue.lit),
                     )?,
                     "worker_threads" | "workers" | "threads" => config.set_threads(
-                        namevalue.lit.clone(),
-                        syn::spanned::Spanned::span(&namevalue.lit),
-                    )?,
-                    "driver" => config.set_driver(
                         namevalue.lit.clone(),
                         syn::spanned::Spanned::span(&namevalue.lit),
                     )?,
@@ -235,17 +196,7 @@ fn parse_knobs(
         (start, end)
     };
 
-    let mut rt = match config.driver {
-        DriverType::Legacy => {
-            quote_spanned! {last_stmt_start_span=>snowfallio::RuntimeBuilder::<snowfallio::LegacyDriver>::new()}
-        }
-        DriverType::Uring => {
-            quote_spanned! {last_stmt_start_span=>snowfallio::RuntimeBuilder::<snowfallio::IoUringDriver>::new()}
-        }
-        DriverType::Fusion => {
-            quote_spanned! {last_stmt_start_span=>snowfallio::RuntimeBuilder::<snowfallio::FusionDriver>::new()}
-        }
-    };
+    let mut rt = quote_spanned! {last_stmt_start_span=>snowfallio::RuntimeBuilder::<snowfallio::IoUringDriver>::new()};
 
     if let Some(entries) = config.entries {
         rt = quote! { #rt.with_entries(#entries) }
@@ -328,16 +279,8 @@ fn parse_knobs(
     } else {
         quote! {}
     };
-    let cfg_attr = if config.driver == DriverType::Uring && is_test {
-        quote! {
-            #[cfg(target_os = "linux")]
-        }
-    } else {
-        quote! {}
-    };
     let result = quote! {
         #header
-        #cfg_attr
         #input
     };
     Ok(result.into())
@@ -371,38 +314,4 @@ pub(crate) fn test(args: TokenStream, item: TokenStream) -> TokenStream {
 
     parse_knobs(input, args, true, Configuration::new())
         .unwrap_or_else(|e| e.to_compile_error().into())
-}
-
-pub(crate) fn test_all(args: TokenStream, item: TokenStream) -> TokenStream {
-    let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let args = syn::parse_macro_input!(args as syn::AttributeArgs);
-
-    for attr in &input.attrs {
-        if attr.path.is_ident("test") {
-            let msg = "second test attribute is supplied";
-            return syn::Error::new_spanned(attr, msg).to_compile_error().into();
-        }
-    }
-
-    let mut input_uring = input.clone();
-    input_uring.sig.ident = proc_macro2::Ident::new(
-        &format!("uring_{}", input_uring.sig.ident),
-        input_uring.sig.ident.span(),
-    );
-    let mut config = Configuration::new();
-    config.driver = Some((DriverType::Uring, Span::call_site()));
-    let mut token_uring = parse_knobs(input_uring, args.clone(), true, config)
-        .unwrap_or_else(|e| e.to_compile_error().into());
-
-    let mut input_legacy = input;
-    input_legacy.sig.ident = proc_macro2::Ident::new(
-        &format!("legacy_{}", input_legacy.sig.ident),
-        input_legacy.sig.ident.span(),
-    );
-    let mut config = Configuration::new();
-    config.driver = Some((DriverType::Legacy, Span::call_site()));
-    let token_legacy = parse_knobs(input_legacy, args, true, config)
-        .unwrap_or_else(|e| e.to_compile_error().into());
-    token_uring.extend(token_legacy);
-    token_uring
 }

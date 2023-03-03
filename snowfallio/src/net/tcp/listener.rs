@@ -1,20 +1,15 @@
-#[cfg(unix)]
-use std::os::unix::prelude::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
-#[cfg(windows)]
-use std::os::windows::prelude::{AsRawHandle, FromRawSocket, RawHandle};
 use std::{
     cell::UnsafeCell,
     future::Future,
     io,
     net::{Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6, ToSocketAddrs},
+    os::unix::prelude::{AsRawFd, FromRawFd, IntoRawFd, RawFd},
 };
 
 use super::stream::TcpStream;
-#[cfg(unix)]
-use crate::io::CancelHandle;
 use crate::{
     driver::{op::Op, shared_fd::SharedFd},
-    io::stream::Stream,
+    io::{stream::Stream, CancelHandle},
     net::ListenerConfig,
 };
 
@@ -27,10 +22,7 @@ pub struct TcpListener {
 
 impl TcpListener {
     pub(crate) fn from_shared_fd(fd: SharedFd) -> Self {
-        #[cfg(unix)]
         let sys_listener = unsafe { std::net::TcpListener::from_raw_fd(fd.raw_fd()) };
-        #[cfg(windows)]
-        let sys_listener = unsafe { std::net::TcpListener::from_raw_socket(todo!()) };
         Self {
             fd,
             sys_listener: Some(sys_listener),
@@ -56,11 +48,7 @@ impl TcpListener {
         let sys_listener =
             socket2::Socket::new(domain, socket2::Type::STREAM, Some(socket2::Protocol::TCP))?;
 
-        #[cfg(all(unix, feature = "legacy"))]
-        Self::set_non_blocking(&sys_listener)?;
-
         let addr = socket2::SockAddr::from(addr);
-        #[cfg(unix)]
         if config.reuse_port {
             sys_listener.set_reuse_port(true)?;
         }
@@ -76,11 +64,7 @@ impl TcpListener {
         sys_listener.bind(&addr)?;
         sys_listener.listen(config.backlog)?;
 
-        #[cfg(unix)]
-        let fd = SharedFd::new(sys_listener.into_raw_fd())?;
-
-        #[cfg(windows)]
-        let fd = unimplemented!();
+        let fd = SharedFd::new(sys_listener.into_raw_fd());
 
         Ok(Self::from_shared_fd(fd))
     }
@@ -91,7 +75,6 @@ impl TcpListener {
         Self::bind_with_config(addr, &cfg)
     }
 
-    #[cfg(unix)]
     /// Accept
     pub async fn accept(&self) -> io::Result<(TcpStream, SocketAddr)> {
         let op = Op::accept(&self.fd)?;
@@ -103,7 +86,7 @@ impl TcpListener {
         let fd = completion.meta.result?;
 
         // Construct stream
-        let stream = TcpStream::from_shared_fd(SharedFd::new(fd as _)?);
+        let stream = TcpStream::from_shared_fd(SharedFd::new(fd as _));
 
         // Construct SocketAddr
         let storage = completion.data.addr.0.as_ptr() as *const _ as *const libc::sockaddr_storage;
@@ -138,7 +121,6 @@ impl TcpListener {
         Ok((stream, addr))
     }
 
-    #[cfg(unix)]
     /// Cancelable accept
     pub async fn cancelable_accept(&self, c: CancelHandle) -> io::Result<(TcpStream, SocketAddr)> {
         use crate::io::operation_canceled;
@@ -156,7 +138,7 @@ impl TcpListener {
         let fd = completion.meta.result?;
 
         // Construct stream
-        let stream = TcpStream::from_shared_fd(SharedFd::new(fd as _)?);
+        let stream = TcpStream::from_shared_fd(SharedFd::new(fd as _));
 
         // Construct SocketAddr
         let storage = completion.data.addr.0.as_ptr() as *const _ as *const libc::sockaddr_storage;
@@ -191,12 +173,6 @@ impl TcpListener {
         Ok((stream, addr))
     }
 
-    #[cfg(windows)]
-    /// Accept
-    pub async fn accept(&self) -> io::Result<(TcpStream, SocketAddr)> {
-        unimplemented!()
-    }
-
     /// Returns the local address that this listener is bound to.
     pub fn local_addr(&self) -> io::Result<SocketAddr> {
         let meta = self.meta.get();
@@ -211,16 +187,6 @@ impl TcpListener {
                 unsafe { &mut *meta }.local_addr = Some(addr);
                 addr
             })
-    }
-
-    #[cfg(all(unix, feature = "legacy"))]
-    fn set_non_blocking(_socket: &socket2::Socket) -> io::Result<()> {
-        crate::driver::CURRENT.with(|x| match x {
-            // TODO: windows ioring support
-            #[cfg(all(target_os = "linux", feature = "iouring"))]
-            crate::driver::Inner::Uring(_) => Ok(()),
-            crate::driver::Inner::Legacy(_) => _socket.set_nonblocking(true),
-        })
     }
 
     /// Wait for read readiness.
@@ -256,7 +222,6 @@ impl std::fmt::Debug for TcpListener {
     }
 }
 
-#[cfg(unix)]
 impl AsRawFd for TcpListener {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
@@ -264,20 +229,10 @@ impl AsRawFd for TcpListener {
     }
 }
 
-#[cfg(windows)]
-impl AsRawHandle for TcpListener {
-    fn as_raw_handle(&self) -> RawHandle {
-        self.fd.raw_handle()
-    }
-}
-
 impl Drop for TcpListener {
     #[inline]
     fn drop(&mut self) {
-        #[cfg(unix)]
         self.sys_listener.take().unwrap().into_raw_fd();
-        #[cfg(windows)]
-        unimplemented!()
     }
 }
 

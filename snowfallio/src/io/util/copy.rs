@@ -75,7 +75,7 @@ where
 }
 
 /// Copy with splice.
-#[cfg(all(target_os = "linux", feature = "splice"))]
+#[cfg(feature = "splice")]
 pub async fn zero_copy<SRC: crate::io::as_fd::AsReadFd, DST: crate::io::as_fd::AsWriteFd>(
     reader: &mut SRC,
     writer: &mut DST,
